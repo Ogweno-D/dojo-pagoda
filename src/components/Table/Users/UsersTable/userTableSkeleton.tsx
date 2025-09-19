@@ -3,8 +3,8 @@ import React from "react";
 import "./userTable.css";
 
 export const UserTableSkeleton: React.FC<{ rows?: number; columns?: number }> = ({
-                                                                                     rows = 5,
-                                                                                     columns = 4}) => {
+                                                                                     rows = 10,
+                                                                                     columns = 6}) => {
     return (
         <div className="table-wrapper">
             <table className="styled-table">

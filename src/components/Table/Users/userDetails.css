@@ -73,43 +73,4 @@
     outline: none;
 }
 
-/* Buttons */
-.form-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.btn-primary {
-    background: #007bff;
-    color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-    background: #0056b3;
-}
-
-.btn-danger {
-    background: #dc3545;
-    color: white;
-}
-
-.btn-danger:hover:not(:disabled) {
-    background: #a71d2a;
-}
-
 /* Error message*

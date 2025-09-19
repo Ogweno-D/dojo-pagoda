@@ -1,3 +1,33 @@
+.users-container{
+    margin: 1rem .5rem;
+    padding: 1rem;
+}
+.users-container h1{
+    font-size:  2.5rem;
+    font-weight: bold;
+    margin:0 1.2rem;
+}
+
+.form-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.form-search {
+    width: 600px;
+}
+.form-filters{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+.form-filters select{
+    width: 15rem;
+    padding: 0.5rem;
+}
 /* Table wrapper */
 .table-wrapper {
     margin: 1rem 0;

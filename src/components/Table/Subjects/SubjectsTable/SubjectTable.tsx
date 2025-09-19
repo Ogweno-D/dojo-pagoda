@@ -83,19 +83,23 @@ function SubjectTable() {
 
 
     return (
-        <div>
-            <h2>Subjects</h2>
+        <div className={"subject-container"}>
+            <div className={"subject-container-header"}>
+                <div>
+                    <h2>Subjects</h2>
+                </div>
+
+                <div className={""}>
+                    <button className="btn btn-primary" onClick={() => setCreateOpen(true)}>
+                        Create New Subject
+                    </button>
+                </div>
+            </div>
 
             {error && <div className="error">{String(error)}</div>}
 
             {subjects.length> 0 ? (
                 <>
-                    <div className={""}>
-                        <button className="btn btn-success" onClick={() => setCreateOpen(true)}>
-                            ➕ Create New Subject
-                        </button>
-                    </div>
-
                     <Table
                         tableId={"usersTable"}
                         data={subjects}
@@ -104,38 +108,46 @@ function SubjectTable() {
                     />
 
                     {/* Pagination Controls */}
-                    <div className="">
-                    <span>
-                        Page{" "}
-                        <strong>
-                            {data?.current_page ?? 1} of {data?.last_page ?? 1}
-                        </strong>{" "}
-                        (Total Records: {data?.total_count ?? 0})
-                    </span>
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={() => setPage(page - 1)}
-                                disabled={page === 1}
-                            >
-                                Previous
-                            </button>
-                            <button
-                                onClick={() => setPage(page + 1)}
-                                disabled={page === (data?.last_page ?? 1)}
-                            >
-                                Next
-                            </button>
-                            <select
-                                value={pageSize}
-                                onChange={(e) => {
-                                    setPageSize(Number(e.target.value));
-                                    setPage(1); // Reset to page 1 when pageSize changes
-                                }}
-                            >
-                                <option value={5}>5 per page</option>
-                                <option value={10}>10 per page</option>
-                                <option value={20}>20 per page</option>
-                            </select>
+                    <div className={"table-footer"}>
+                        <div className="table-pagination">
+                            <div>
+                                <button
+                                    className={`pagination-btn ${page === 1 ? "disabled" : ""}`}
+                                    onClick={() => setPage(page - 1)}
+                                    disabled={page === 1}
+                                >
+                                    Previous
+                                </button>
+                                <span style={{ marginLeft: "5px" }}>
+                                 Page{" "}
+                                    <strong>
+                                    {data?.current_page ?? 1} of {data?.last_page ?? 1}
+                                    </strong>{" "}
+                                    {/*(Total Records: {data?.total_count ?? 0})*/}
+                                 </span>
+                                <button
+                                    className={`pagination-btn ${page === (data?.last_page ?? 1) ? "disabled" : ""}`}
+                                    onClick={() => setPage(page + 1)}
+                                    disabled={page === (data?.last_page ?? 1)}
+                                >
+                                    Next
+                                </button>
+                            </div>
+
+                            <div>
+                                <select
+                                    value={pageSize}
+                                    onChange={(e) => {
+                                        setPageSize(Number(e.target.value));
+                                        setPage(1);
+                                    }}
+                                >
+                                    <option value={5}>5 per page</option>
+                                    <option value={10}>10 per page</option>
+                                    <option value={20}>20 per page</option>
+                                </select>
+                            </div>
+
                         </div>
                     </div>
 

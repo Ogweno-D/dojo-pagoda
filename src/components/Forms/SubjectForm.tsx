@@ -72,7 +72,7 @@
                     />
                 </div>
 
-                <button type="submit" className="form-btn">
+                <button type="submit" className="btn btn-primary">
                     {submitLabel}
 
                 </button>

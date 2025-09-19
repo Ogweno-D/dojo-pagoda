@@ -2,8 +2,27 @@ import {NavbarItem} from "./NavItem.tsx";
 import {Icon} from "../Icons/Icon.tsx";
 
 import  "./navbar.css"
+import {useAuth} from "../../context/auth/AuthContext.tsx";
+import React, {useEffect, useRef} from "react";
 
 export  default function  Navbar() {
+
+    const {user, logout} = useAuth();
+    const [open, setOpen] = React.useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // Close on outside click
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     return <header className="header">
         <nav className="navbar">
             <div className="navbar-item">
@@ -39,32 +58,6 @@ export  default function  Navbar() {
 
                 />
 
-                <div className="select-wrapper">
-                    <select>
-                        <option disabled defaultValue={"Apstar Sacco Limited"}>Select Option</option>
-                        <option>Apstar Sacco Limited</option>
-                        <option>Mwitu Sacco</option>
-                    </select>
-
-                    <svg
-                        className="select-icon"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M4.66663 5.24999L6.99996 2.91666L9.33329 5.24999M9.33329 8.74999L6.99996 11.0833L4.66663 8.74999"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </svg>
-                </div>
-
-
                 <NavbarItem icon= {
                     <Icon>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -72,13 +65,25 @@ export  default function  Navbar() {
                         </svg>
                     </Icon>
                 }/>
-                <NavbarItem icon= {
-                    <Icon>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div className="navbar-item-wrapper" ref={menuRef}>
+                    <button
+                        className="navbar-icon-btn"
+                        onClick={() => setOpen(!open)}
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
                             <path d="M6.16797 18.849C6.41548 18.0252 6.92194 17.3032 7.61222 16.79C8.30249 16.2768 9.13982 15.9997 9.99997 16H14C14.8612 15.9997 15.6996 16.2774 16.3904 16.7918C17.0811 17.3062 17.5874 18.0298 17.834 18.855M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12ZM15 10C15 11.6569 13.6569 13 12 13C10.3431 13 9 11.6569 9 10C9 8.34315 10.3431 7 12 7C13.6569 7 15 8.34315 15 10Z" stroke="#CED4DA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                    </Icon>
-                }/>
+                    </button>
+
+                    {open && (
+                        <div className="dropdown">
+                            <p className="dropdown-username">{user?.name ?? "Guest"}</p>
+                            <button className="dropdown-item" onClick={logout}>
+                                Logout
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
         </nav>
     </header>

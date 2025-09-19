@@ -1,14 +1,16 @@
-// AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useFetch } from "../../hooks/api/useFetch.tsx";
+import type { User } from "../../components/Table/Users/User.type.ts";
 
-type AuthState = {
-    role: "vendor" | "client";
-};
+interface SingleUserApiResponse {
+    user: User;
+}
 
 type AuthContextType = {
-    user: AuthState | null;
+    user: User | null;
     loading: boolean;
-    login: (data: AuthState) => void;
+    refetchUser: () => Promise<void>;
+    login: (token: string) => void;
     logout: () => void;
     isAuthenticated: () => boolean;
 };
@@ -16,33 +18,53 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<AuthState | null>(null);
-    const [loading, setLoading] = useState(true);
+    // API endpoint for profile
+    const url = `/api/admin/users/profile`;
+    const fetchOptions = {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_ADMIN_BEARER_TOKEN}`, // if using token
+        },
+    };
 
+    const {
+        data,
+        loading,
+        error,
+        refetch: refetchUser,
+    } = useFetch<SingleUserApiResponse>(url, fetchOptions);
+
+    const [user, setUser] = useState<User | null>(null);
+
+    // Sync when API returns data
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) setUser(JSON.parse(storedUser));
-        setLoading(false);
-    }, []);
+        if (data?.user) {
+            setUser(data.user);
+        }
+    }, [data]);
 
-    const login = (data: AuthState) => {
-        localStorage.setItem("user", JSON.stringify(data));
-        setUser(data);
+    const login = (token: string) => {
+        localStorage.setItem("token", token);
+        refetchUser();
     };
 
     const logout = () => {
-        localStorage.removeItem("user");
+        localStorage.removeItem("token");
         setUser(null);
     };
 
     const isAuthenticated = () => !!user;
 
-    const value = { user, loading, login, logout, isAuthenticated }
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
-    );
+    const value: AuthContextType = {
+        user,
+        loading,
+        refetchUser,
+        login,
+        logout,
+        isAuthenticated,
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

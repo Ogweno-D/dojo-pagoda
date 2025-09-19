@@ -6,6 +6,7 @@ import {Table} from "../../ReusableTable/Table.tsx";
 import {useUserColumns} from "./UserColumns.tsx";
 import {UserTableSkeleton} from "./userTableSkeleton.tsx";
 import {useNavigate} from "@tanstack/react-router";
+import PaginationWrapper from "../../ReusableTable/TableActions/PaginationWrapper.tsx";
 
 interface UserApiResponse {
     records: User[];
@@ -70,33 +71,41 @@ function UserTable() {
 
 
     return (
-        <div>
-            <h2>Users</h2>
-            {/* Filter and Search Controls */}
-            <div className="">
-                <input
-                    type="text"
-                    placeholder="Search by name or email"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <select value={roleFilter} onChange={(e) =>  setRoleFilter(e.target.value)}>
-                    <option value="">All Roles</option>
-                    <option value="admin">Admin</option>
-                    <option value="client">Client</option>
-                    <option value="vendor">Vendor</option>
-                </select>
-                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                    <option value="">All Statuses</option>
-                    <option value="active">Active</option>
-                    <option value="deactivated">Deactivated</option>
-                </select>
+        <div className={"users-container"}>
+            <div>
+                <h1>Users</h1>
+                {/* Filter and Search Controls */}
+                <div className="form-controls">
+                    <div className={"form-search"}>
+                        <input
+                            type="text"
+                            placeholder="Search by name or email"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+
+                    <div className={"form-filters"}>
+                        <select value={roleFilter} onChange={(e) =>  setRoleFilter(e.target.value)}>
+                            <option value="">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="trainee">Trainee</option>
+                        </select>
+                        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                            <option value="">All Statuses</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+
+                </div>
             </div>
 
             {error && <div className="error">{String(error)}</div>}
 
             {users.length> 0 ? (
-                <>
+                <div className={"results-table"}>
                     <Table
                         tableId={"usersTable"}
                         data={users}
@@ -105,43 +114,16 @@ function UserTable() {
                     />
 
                     {/* Pagination Controls */}
-                    <div className="flex justify-between items-center my-4">
-                    <span>
-                        Page{" "}
-                        <strong>
-                            {data?.current_page ?? 1} of {data?.last_page ?? 1}
-                        </strong>{" "}
-                        (Total Records: {data?.total_count ?? 0})
-                    </span>
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={() => setPage(page - 1)}
-                                disabled={page === 1}
-                            >
-                                Previous
-                            </button>
-                            <button
-                                onClick={() => setPage(page + 1)}
-                                disabled={page === (data?.last_page ?? 1)}
-                            >
-                                Next
-                            </button>
-                            <select
-                                value={pageSize}
-                                onChange={(e) => {
-                                    setPageSize(Number(e.target.value));
-                                    setPage(1); // Reset to page 1 when pageSize changes
-                                }}
-                            >
-                                <option value={5}>5 per page</option>
-                                <option value={10}>10 per page</option>
-                                <option value={20}>20 per page</option>
-                            </select>
-                        </div>
-                    </div>
-                </>
+                    <PaginationWrapper page={page} onClick={() => setPage(page - 1)} data={data}
+                                       onClick1={() => setPage(page + 1)} value={pageSize} onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setPage(1);
+                    }}/>
+                </div>
             ) : (
-                <p>No users found.</p>
+                <div className={"no-data-error"}>
+                    <h2> No users found.</h2>
+                </div>
             )}
         </div>
     );

@@ -6,6 +6,8 @@ import {buildQueryParams} from "../../../../utils/queryParams.ts";
 import {UserTableSkeleton} from "../../Users/UsersTable/userTableSkeleton.tsx";
 import {Table} from "../../ReusableTable/Table.tsx";
 import {useFetch} from "../../../../hooks/api/useFetch.tsx";
+import "../task.css"
+import PaginationWrapper from "../../ReusableTable/TableActions/PaginationWrapper.tsx";
 
 interface TaskApiResponse {
     domain:string;
@@ -14,6 +16,7 @@ interface TaskApiResponse {
     page_size:number;
     records: Task[];
 }
+
 
 function TaskTable(){
     const navigate = useNavigate();
@@ -67,13 +70,17 @@ function TaskTable(){
     }
 
     return (
-        <div>
-            <button
-                onClick={createTask}
-            >
-                Create Form
-            </button>
-            <h2>Tasks</h2>
+        <div className={"task-container"}>
+            <div className={"task-container-header"}>
+                <h1>Tasks</h1>
+                <button
+                    className={"btn btn-primary"}
+                    onClick={createTask}
+                >
+                    Create Form
+                </button>
+            </div>
+
 
             {error && <div className="error">{String(error)}</div>}
 
@@ -87,43 +94,16 @@ function TaskTable(){
                     />
 
                     {/* Pagination Controls */}
-                    <div className="flex justify-between items-center my-4">
-                    <span>
-                        Page{" "}
-                        <strong>
-                            {data?.current_page ?? 1} of {data?.last_page ?? 1}
-                        </strong>{" "}
-                        (Total Records: {data?.total_count ?? 0})
-                    </span>
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={() => setPage(page - 1)}
-                                disabled={page === 1}
-                            >
-                                Previous
-                            </button>
-                            <button
-                                onClick={() => setPage(page + 1)}
-                                disabled={page === (data?.last_page ?? 1)}
-                            >
-                                Next
-                            </button>
-                            <select
-                                value={pageSize}
-                                onChange={(e) => {
-                                    setPageSize(Number(e.target.value));
-                                    setPage(1); // Reset to page 1 when pageSize changes
-                                }}
-                            >
-                                <option value={5}>5 per page</option>
-                                <option value={10}>10 per page</option>
-                                <option value={20}>20 per page</option>
-                            </select>
-                        </div>
-                    </div>
+                    <PaginationWrapper page={page} onClick={() => setPage(page - 1)} data={data}
+                                       onClick1={() => setPage(page + 1)} value={pageSize} onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setPage(1);
+                    }}/>
                 </>
             ) : (
-                <p>No tasks found.</p>
+                <div className={"no-data-error"}>
+                    <h2> No tasks found.</h2>
+                </div>
             )}
         </div>
     );

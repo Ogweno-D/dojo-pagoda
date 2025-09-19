@@ -3,6 +3,7 @@ import {useFetch} from "../../../hooks/api/useFetch.tsx";
 import {useMutate} from "../../../hooks/api/useMutate.tsx";
 import React, {useEffect, useState} from "react";
 import {useToast} from "../../../hooks/toast/useToast.tsx";
+    import Spinner from "../../Spinner/Spinner.tsx";
 
 interface  SingleUserProps{
     id: number;
@@ -108,9 +109,16 @@ function SingleUser({id}: SingleUserProps) {
     }
 
     //
-    if (loading) return <p>Loading user data...</p>;
+    if (loading) return<Spinner/>;
     if (error) return <p className="error">Error fetching user: {String(userError)}</p>;
-    if (!user) return <p>No user found for this ID.</p>;
+
+    if (!user) {
+        return (
+            <div className="not-found-error">
+                No user found
+            </div>
+        )
+    }
 
 
     return (

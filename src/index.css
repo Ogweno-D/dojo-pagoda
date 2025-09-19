@@ -1,10 +1,8 @@
 @import '@mantine/core/styles.css';
-/*@import '@mantine/tiptap/styles.css';*/
 
 :root {
     --font-family: 'Inter', sans-serif;
 }
-
 @font-face {
     font-family: 'Lexend Deca';
     src: url('./assets/fonts/LexendDeca-VariableFont_wght.ttf') format('truetype');
@@ -20,7 +18,15 @@
 body{
     font-family: Inter, Helvetica, sans-serif;
     font-size: 16px;
-
+    font-weight: 500;
+}
+h1 {
+    font-size: 2rem;
+    line-height: 1.2
+}
+h2{
+    font-size: 1.8rem;
+    line-height: 1.2
 }
 .main-layout{
     margin: 0;
@@ -55,6 +61,16 @@ body{
     height: 100%;
 }
 
+
+/* Table*/
+table{
+    border-collapse: collapse;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    margin: 1rem .5rem;
+    padding: 1rem;
+}
 
 /* Global Styles*/
 /* Forms*/
@@ -95,3 +111,105 @@ textarea:focus {
 }
 
 /*Buttons*/
+.btn {
+    display: inline-block;
+    padding: .8rem  .8rem;
+    font-size:.9rem;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    min-width: 120px;
+}
+
+.btn-primary {
+    background-color:hsl(191, 64%, 20%) ;
+    color: white;
+    border-color: hsl(191, 64%, 80%);
+}
+.btn-primary:hover {
+    background-color: hsl(191, 64%, 25%);
+    border-color: hsl(191, 64%, 30%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px hsl(191, 64%, 35%);
+}
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px hsl(191, 64%, 20%);
+}
+.btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px hsl(191, 64%, 20%);
+}
+
+.btn-secondary {
+    background-color:hsl(191, 64%, 30%) ;
+    color: hsl(191, 64%, 80%);
+    border-color: hsl(191, 64%, 90%);
+}
+.btn-secondary:hover {
+    background-color: hsl(191, 64%, 25%);
+    border-color: hsl(191, 64%, 30%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px hsl(191, 64%, 35%);
+}
+.btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px hsl(191, 64%, 20%);
+}
+.btn-secondary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px hsl(191, 64%, 20%);
+}
+
+.btn-accent {
+    border: 2px solid #FD7E14;
+    color: #FD7E14;
+    background:none;
+}
+.btn-accent:hover {
+    background-color: #FD7E14;
+    color: #fff;
+
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+.btn-danger:hover {
+    background-color: hsl(354, 70%, 60%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px hsl(354, 70%, 70%);
+}
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pagination-btn{
+    display: inline-block;
+    padding:.1rem 1rem;
+    text-align: center;
+    background-color:hsl(191, 64%, 20%) ;
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 4px;
+}
+.pagination-btn.disabled{
+    opacity: 0.6;
+}
+
+
+.results-table{
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    padding: 1rem .5rem;
+    margin: 1rem .5rem;
+}

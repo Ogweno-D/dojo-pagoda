@@ -9,12 +9,12 @@ export function useTaskColumns(){
         createTableColumn<Task>({
             id:"id",
             caption: "Task ID",
-            size: 80,
+            size: 20
         }),
         createTableColumn<Task>({
             id:"title",
             caption: "Task Title",
-            size: 80,
+            size: 60,
         }),
         createTableColumn<Task>({
             id:"description",

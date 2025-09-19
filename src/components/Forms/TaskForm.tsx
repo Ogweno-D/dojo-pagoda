@@ -2,6 +2,7 @@ import { buildQueryParams } from "../../utils/queryParams.ts";
 import { useFetch } from "../../hooks/api/useFetch.tsx";
 import type { Subject } from "../Table/Subjects/Subject.type.ts";
 import React, { useEffect, useState } from "react";
+import "./form.css"
 
 export interface TaskFormData {
     subject_id?: number;
@@ -56,7 +57,7 @@ function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFo
             "Content-Type": "application/json",
         },
     };
-    const { data } = useFetch<SubjectApiResponse>(subjectUrl, fetchOptions);
+    const { data, loading:subjectLoading} = useFetch<SubjectApiResponse>(subjectUrl, fetchOptions);
     const subjects: Subject[] = data?.records ?? [];
 
     // handle input changes
@@ -68,6 +69,11 @@ function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFo
             ...prev,
             [name]: name === "subject_id" || name === "max_score" ? Number(value) : value,
         }));
+        if(subjectLoading){
+            return(
+                <Spinner/>
+            );
+        }
     };
 
     // handle submit
@@ -166,7 +172,7 @@ function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFo
                 />
             </div>
 
-            <button type="submit" className="form-btn">
+            <button type="submit" className="btn btn-primary">
                 {submitLabel}
             </button>
         </form>

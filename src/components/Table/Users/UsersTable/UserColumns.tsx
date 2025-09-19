@@ -32,12 +32,11 @@ export function  useUserColumns() {
             render: (name) => <strong style={{ textDecoration: 'underline' }}>{name}</strong>,
             rowProps: (user) => {
                 let backgroundColor = 'transparent';
-                if (user.role === 'admin') {
+                if (user.status === 'approved') {
                     backgroundColor = '#fca5a5';
                 } else if (user.status === 'approved') {
                     backgroundColor = '#bfdbfe';
                 }
-
                 return {
                     style: { backgroundColor },
                 };

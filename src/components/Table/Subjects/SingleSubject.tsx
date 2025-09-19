@@ -9,6 +9,9 @@ import SubjectForm from "../../Forms/SubjectForm.tsx";
 import SingleTask from "../Tasks/SingleTask.tsx";
 import TaskForm from "../../Forms/TaskForm.tsx";
 import {Modal} from "../../Modals/Modal.tsx";
+import {DeleteConfirmModal} from "../../Modals/Custom/DeleteConfirmModal.tsx";
+import Spinner from "../../Spinner/Spinner.tsx";
+import "./subject.css"
 
 interface SingleSubjectProps {
     subjectId: number;
@@ -77,10 +80,10 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
     const [isEditOpen, setEditOpen] = useState(false);
     const [isTaskCreateOpen, setTaskCreateOpen] = useState(false);
     const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+    const [deleteOpen, setDeleteOpen] = useState(false);
 
     // Handle delete
     const handleDelete = async () => {
-        if (window.confirm("Are you sure you want to delete this subject?")) {
             try {
                 await deleteMutate(subjectUrl,"DELETE", null, fetchOptions);
 
@@ -98,18 +101,22 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
                     autoClose: 500,
                 });
             }
-        }
     };
 
     // States
-    if (subjectLoading) return <p>Loading subject data...</p>;
-    if (subjectError) return <p className="error">Error: {String(subjectError)}</p>;
-    if (!subject) return <p>No subject found for this ID.</p>;
+    if (subjectLoading) return <Spinner />;
+    if (subjectError) {
+        return (
+            <p className="error">Error: {String(subjectError)}</p>
+        )
+    }
+    if (!subject) {
+        return <p>No subject found for this ID.</p>
+    }
 
     return (
-        <div className="subject-container">
+        <div className="single-subject-container">
             <h1 className="subject-title">Subject Details</h1>
-
             <div className="card">
                 <p>
                     <strong>Name:</strong> {subject.name}
@@ -121,17 +128,18 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
 
             {/* Actions */}
             <div className="form-actions" style={{ marginTop: "1rem" }}>
-                <button className="btn btn-primary" onClick={() => setEditOpen(true)}>
+                <button
+                    className="btn btn-primary"
+                    onClick={() => setEditOpen(true)}>
                     Edit Subject
                 </button>
 
                 <button
                     className="btn btn-danger"
-                    onClick={handleDelete}
-                    disabled={deleteLoading}
-                >
-                    {deleteLoading ? "Deleting..." : "Delete Subject"}
+                    onClick={() => setDeleteOpen(true)}>
+                    Delete Subject
                 </button>
+
                 <button
                     className="btn btn-accent"
                     onClick={() => setTaskCreateOpen(true)}
@@ -139,6 +147,15 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
                     Create Task
                 </button>
             </div>
+
+            {/*Delete Confirm Modal*/}
+            <DeleteConfirmModal
+                open={deleteOpen}
+                onClose={()=>setDeleteOpen(false)}
+                onConfirm={handleDelete}
+                loading={deleteLoading}
+                message={"Do you really want to delete this subject?"}
+            />
 
             {/* Edit Modal */}
             <Modal isOpen={isEditOpen} onClose={() => setEditOpen(false)}>
@@ -201,27 +218,29 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
             <hr className="divider" />
 
             {/* Task List */}
-            <h2 className="tasks-title">Tasks under this subject</h2>
-            {tasksLoading && <p>Loading tasks...</p>}
-            {tasksError && (
-                <p className="error">Error fetching tasks: {String(tasksError)}</p>
-            )}
-            {!tasksLoading && tasks.length === 0 && <p>No tasks found for this subject.</p>}
+            <div className="subject-task-container card">
+                <h2 className="tasks-title">Tasks</h2>
+                {tasksLoading && <Spinner/>}
+                {tasksError && (
+                    <p className="error">Error fetching tasks: {String(tasksError)}</p>
+                )}
+                {!tasksLoading && tasks.length === 0 && <p>No tasks found for this subject.</p>}
 
-            <ul className="task-list">
-                {tasks.map((task) => (
-                    <li
-                        key={task.id}
-                        className="task-item"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => setSelectedTaskId(task.id)}
-                    >
-                        <strong>{task.title}</strong>
-                        <p>{task.description}</p>
-                        <small>Status: {task.status}</small>
-                    </li>
-                ))}
-            </ul>
+                <ul className="task-list">
+                    {tasks.map((task) => (
+                        <li
+                            key={task.id}
+                            className="task-item"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => setSelectedTaskId(task.id)}
+                        >
+                            <strong>{task.title}</strong>
+                            <p>{task.description}</p>
+                            <small>Status: {task.status}</small>
+                        </li>
+                    ))}
+                </ul>
+            </div>
 
             {/* Task Modal */}
             <Modal isOpen={!!selectedTaskId} onClose={() => setSelectedTaskId(null)}>
