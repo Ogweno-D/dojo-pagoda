@@ -39,7 +39,6 @@ function UserTable() {
     const fetchOptions = {
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
         },
     };
 

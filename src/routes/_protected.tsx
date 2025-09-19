@@ -24,7 +24,9 @@ function RouteComponent() {
           <Navbar/>
           <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
           <main className={"main-content-container"} >
-            <Outlet />
+              <div className={"main-content"}>
+                  <Outlet />
+              </div>
           </main>
           <footer className={"footer"}>
               <Footer />

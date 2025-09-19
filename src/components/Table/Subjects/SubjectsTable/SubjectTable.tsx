@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useFetch } from "../../../../hooks/api/useFetch.tsx";
 import { buildQueryParams } from "../../../../utils/queryParams.ts";
 import type { Subject } from "../Subject.type.ts";
@@ -6,6 +6,9 @@ import {Table} from "../../ReusableTable/Table.tsx";
 import {useNavigate} from "@tanstack/react-router";
 import {useSubjectColumns} from "./SubjectColumns.tsx";
 import {UserTableSkeleton} from "../../Users/UsersTable/userTableSkeleton.tsx";
+import {Modal} from "../../../Modals/Modal.tsx";
+import SubjectForm from "../../../Forms/SubjectForm.tsx";
+import {useMutate} from "../../../../hooks/api/useMutate.tsx";
 
 interface SubjectApiResponse {
     records: Subject[];
@@ -27,6 +30,8 @@ function SubjectTable() {
     const [statusFilter, setStatusFilter] = useState('');
     const columns = useSubjectColumns();
 
+    const [isCreateOpen, setCreateOpen] = useState(false);
+
     // Params
     const params = {
         page,
@@ -41,16 +46,21 @@ function SubjectTable() {
     const fetchOptions = {
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
         },
     };
 
-    const { data, loading, error } = useFetch<SubjectApiResponse>(
+    const { data, loading, error , refetch: refetchSubjects} = useFetch<SubjectApiResponse>(
         url,
         fetchOptions
     );
 
     const subjects: Subject[] = data?.records ?? [];
+
+    // Mutation
+    const { mutate: createMutate } = useMutate<
+        SingleSubjectApiResponse,
+        { name: string; description: string }
+    >("/api/admin/subjects");
 
     if (loading) {
         return <UserTableSkeleton rows={8} columns={5} />;
@@ -80,6 +90,12 @@ function SubjectTable() {
 
             {subjects.length> 0 ? (
                 <>
+                    <div className={""}>
+                        <button className="btn btn-success" onClick={() => setCreateOpen(true)}>
+                            ➕ Create New Subject
+                        </button>
+                    </div>
+
                     <Table
                         tableId={"usersTable"}
                         data={subjects}
@@ -88,7 +104,7 @@ function SubjectTable() {
                     />
 
                     {/* Pagination Controls */}
-                    <div className="flex justify-between items-center my-4">
+                    <div className="">
                     <span>
                         Page{" "}
                         <strong>
@@ -122,6 +138,26 @@ function SubjectTable() {
                             </select>
                         </div>
                     </div>
+
+                    {/* Create Modal */}
+                    <Modal isOpen={isCreateOpen} onClose={() => setCreateOpen(false)}>
+                        <h2>Create Subject</h2>
+                        <SubjectForm
+                            submitLabel="Create Subject"
+                            onSubmit={async (formData) => {
+                                await createMutate(
+                                    "/api/admin/subjects",
+                                    "POST",
+                                    formData,
+                                    fetchOptions
+                                );
+                                setCreateOpen(false);
+                                showToast({ variant: "success", title: "Subject created!" });
+                            }}
+                            refetch={refetchSubjects}
+                        />
+                    </Modal>
+
                 </>
             ) : (
                 <p>No users found.</p>

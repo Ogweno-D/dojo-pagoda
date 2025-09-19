@@ -67,14 +67,9 @@ const sidebarItems: SidebarItemData[] = [
         text: "Subjects",
         icon: <ResolvedReceiptsIcon/>,
     },
-    // {
-    //     to: "/company",
-    //     text: "Company",
-    //     icon: <CompanyIcon/>,
-    // },
     {
         to: "/users",
-        text: "People",
+        text: "Users",
         icon: <PeopleIcon/>,
     },
     {

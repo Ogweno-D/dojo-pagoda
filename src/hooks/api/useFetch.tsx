@@ -16,9 +16,15 @@ export const useFetch = <T,>( url:string, options={}) => {
             setLoading(true);
 
             try{
+                const token = import.meta.env.VITE_ADMIN_BEARER_TOKEN;
                 const response = await fetch(url, {
                     ...options,
                     signal: controller.signal,
+                    headers:{
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                        ...options.headers,
+                    }
                 });
 
                 if(!response.ok){

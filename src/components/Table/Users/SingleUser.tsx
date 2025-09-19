@@ -25,7 +25,6 @@ function SingleUser({id}: SingleUserProps) {
     const fetchOptions = {
         headers : {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
         }
     }
     const {data, loading, error, refetch} = useFetch<SingleUserApiResponse>(
@@ -128,7 +127,7 @@ function SingleUser({id}: SingleUserProps) {
             <hr className="divider" />
 
             <form onSubmit={handleUpdate} className="card form">
-                <h2 className="form-title">Update User</h2>
+                <h2 className="form-title">Edit User</h2>
 
                 <div className="form-group">
                     <label>Role</label>

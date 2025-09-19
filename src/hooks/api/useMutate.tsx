@@ -6,6 +6,8 @@ export const useMutate =<TData =unknown, TVariables = unknown, TError = Error> (
     const [error, setError] = useState<TError | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
+    const token = import.meta.env.VITE_ADMIN_BEARER_TOKEN
+
     const mutate = async (
         url: string,
         method: "POST" | "PATCH" | "PUT" | "DELETE",
@@ -21,6 +23,7 @@ export const useMutate =<TData =unknown, TVariables = unknown, TError = Error> (
                 method: method,
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                     ...options?.headers,
                 }
             };
