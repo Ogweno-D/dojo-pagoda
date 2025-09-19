@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useFetch } from "../../../../hooks/api/useFetch.tsx";
 import { buildQueryParams } from "../../../../utils/queryParams.ts";
 import type { Subject } from "../Subject.type.ts";
@@ -9,6 +9,11 @@ import {UserTableSkeleton} from "../../Users/UsersTable/userTableSkeleton.tsx";
 import {Modal} from "../../../Modals/Modal.tsx";
 import SubjectForm from "../../../Forms/SubjectForm.tsx";
 import {useMutate} from "../../../../hooks/api/useMutate.tsx";
+import {useToast} from "../../../../hooks/toast/useToast.tsx";
+import type {SingleSubjectApiResponse} from "../SingleSubject.tsx";
+import {FilterManager} from "../../ReusableTable/TableActions/FilterManager.tsx";
+import {DataTableProvider} from "../../providers/DataTableProvider.tsx";
+import { SortManager } from "../../ReusableTable/TableActions/SortManager.tsx";
 
 interface SubjectApiResponse {
     records: Subject[];
@@ -21,13 +26,11 @@ interface SubjectApiResponse {
 function SubjectTable() {
 
     const navigate = useNavigate();
+    const showToast = useToast();
 
 
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [roleFilter, setRoleFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
     const columns = useSubjectColumns();
 
     const [isCreateOpen, setCreateOpen] = useState(false);
@@ -36,9 +39,6 @@ function SubjectTable() {
     const params = {
         page,
         pageSize,
-        search: searchQuery,
-        role: roleFilter,
-        status: statusFilter,
     };
 
     const url = `/api/admin/subjects/${buildQueryParams(params)}`;
@@ -60,7 +60,7 @@ function SubjectTable() {
     const { mutate: createMutate } = useMutate<
         SingleSubjectApiResponse,
         { name: string; description: string }
-    >("/api/admin/subjects");
+    >();
 
     if (loading) {
         return <UserTableSkeleton rows={8} columns={5} />;
@@ -74,7 +74,7 @@ function SubjectTable() {
 
     // Handle a whole row click
     const handleRowClick = (row: Subject) => {
-        const encodedId = btoa(row.id);
+        const encodedId = btoa(String(row.id));
         navigate({
             to: "/subjects/$subjectId",
             params: {subjectId: encodedId}
@@ -100,12 +100,17 @@ function SubjectTable() {
 
             {subjects.length> 0 ? (
                 <>
-                    <Table
-                        tableId={"usersTable"}
-                        data={subjects}
-                        columns={columns}
-                        onRowClick={handleRowClick}
-                    />
+                    <DataTableProvider data={subjects} initialState={{ filters: [], sorts: [], page: 1, pageSize: 5 }}>
+                        <FilterManager columns={columns} />
+                        <SortManager columns={columns} />
+                        <Table
+                            tableId="usersTable"
+                            data={subjects}
+                            columns={columns}
+                            onRowClick={handleRowClick}
+                        />
+                    </DataTableProvider>
+
 
                     {/* Pagination Controls */}
                     <div className={"table-footer"}>
@@ -164,7 +169,11 @@ function SubjectTable() {
                                     fetchOptions
                                 );
                                 setCreateOpen(false);
-                                showToast({ variant: "success", title: "Subject created!" });
+                                showToast({
+                                    variant: "success",
+                                    message: "Subject Created Successfully",
+                                    autoClose: 500
+                                });
                             }}
                             refetch={refetchSubjects}
                         />

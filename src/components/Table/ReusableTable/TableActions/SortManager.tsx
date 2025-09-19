@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import "./filterSort.css";
 import type { Column, SortRule } from "./types";
 import {useDataTable} from "../../providers/DataTableProvider.tsx";
@@ -30,6 +30,9 @@ export function SortManager({columns}: SortManagerProps) {
         resetRules();
     };
 
+    useEffect(() => {
+        setIsOpen(false)
+    }, []);
     return (
         <>
             <div className="filter-sort-btn" onClick={() => setIsOpen(true)}>

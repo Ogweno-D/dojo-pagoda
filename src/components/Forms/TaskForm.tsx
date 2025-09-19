@@ -1,11 +1,13 @@
+// TaskForm.tsx
 import { buildQueryParams } from "../../utils/queryParams.ts";
 import { useFetch } from "../../hooks/api/useFetch.tsx";
 import type { Subject } from "../Table/Subjects/Subject.type.ts";
 import React, { useEffect, useState } from "react";
-import "./form.css"
+import "./form.css";
+import Spinner from "../Spinner/Spinner.tsx";
 
 export interface TaskFormData {
-    subject_id?: number;
+    subject_id: number;
     title: string;
     description: string;
     requirements: string;
@@ -29,7 +31,7 @@ function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFo
     const [pageSize] = useState(10);
 
     const [formData, setFormData] = useState<TaskFormData>({
-        subject_id: undefined,
+        subject_id: initialData?.subject_id ?? 0,
         title: "",
         description: "",
         requirements: "",
@@ -37,7 +39,6 @@ function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFo
         max_score: 100,
     });
 
-    // prefill if initialData exists (for edit mode)
     useEffect(() => {
         if (initialData) {
             setFormData((prev) => ({
@@ -52,15 +53,10 @@ function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFo
         page,
         page_size: pageSize,
     })}`;
-    const fetchOptions = {
-        headers: {
-            "Content-Type": "application/json",
-        },
-    };
-    const { data, loading:subjectLoading} = useFetch<SubjectApiResponse>(subjectUrl, fetchOptions);
+    const fetchOptions = { headers: { "Content-Type": "application/json" } };
+    const { data, loading: subjectLoading } = useFetch<SubjectApiResponse>(subjectUrl, fetchOptions);
     const subjects: Subject[] = data?.records ?? [];
 
-    // handle input changes
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
@@ -69,14 +65,8 @@ function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFo
             ...prev,
             [name]: name === "subject_id" || name === "max_score" ? Number(value) : value,
         }));
-        if(subjectLoading){
-            return(
-                <Spinner/>
-            );
-        }
     };
 
-    // handle submit
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -95,6 +85,9 @@ function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFo
         await onSubmit(payload);
     };
 
+    if (subjectLoading) {
+        return <Spinner />;
+    }
 
     return (
         <form onSubmit={handleSubmit} className="formContainer">

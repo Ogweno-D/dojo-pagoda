@@ -1,23 +1,23 @@
 import { useFetch } from "../../../hooks/api/useFetch.tsx";
 import { useMutate } from "../../../hooks/api/useMutate.tsx";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useToast } from "../../../hooks/toast/useToast.tsx";
 import type { Subject } from "./Subject.type.ts";
 import type { Task } from "../Tasks/Task.type.ts";
 import { buildQueryParams } from "../../../utils/queryParams.ts";
 import SubjectForm from "../../Forms/SubjectForm.tsx";
 import SingleTask from "../Tasks/SingleTask.tsx";
-import TaskForm from "../../Forms/TaskForm.tsx";
-import {Modal} from "../../Modals/Modal.tsx";
-import {DeleteConfirmModal} from "../../Modals/Custom/DeleteConfirmModal.tsx";
+import TaskForm, {type TaskFormData} from "../../Forms/TaskForm.tsx";
+import { Modal } from "../../Modals/Modal.tsx";
+import { DeleteConfirmModal } from "../../Modals/Custom/DeleteConfirmModal.tsx";
 import Spinner from "../../Spinner/Spinner.tsx";
-import "./subject.css"
+import "./subject.css";
 
 interface SingleSubjectProps {
     subjectId: number;
 }
 
-interface SingleSubjectApiResponse {
+export interface SingleSubjectApiResponse {
     subject: Subject;
     message: string;
 }
@@ -30,19 +30,25 @@ interface TaskApiResponse {
     records: Task[];
 }
 
+// FormData types
+interface SubjectFormData {
+    name: string;
+    description: string;
+}
+
+
 function SingleSubject({ subjectId }: SingleSubjectProps) {
     // Pagination for tasks
     const [page] = useState(1);
     const [pageSize] = useState(10);
     const params = { page, page_size: pageSize, subject_id: subjectId };
-    const taskUrl = `/api/admin/tasks/${buildQueryParams(params)}`;
+    const taskUrl = `/api/admin/tasks${buildQueryParams(params)}`;
 
-    // Hooks
     const showToast = useToast();
     const subjectUrl = `/api/admin/subjects/${subjectId}`;
     const fetchOptions = { headers: { "Content-Type": "application/json" } };
 
-    // Subject Data
+    // Subject fetch
     const {
         data: subjectData,
         loading: subjectLoading,
@@ -52,7 +58,7 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
 
     const subject: Subject | undefined = subjectData?.subject;
 
-    // Task Data
+    // Task fetch
     const {
         data: taskData,
         loading: tasksLoading,
@@ -63,17 +69,19 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
     const tasks: Task[] = taskData?.records ?? [];
 
     // Mutations
-    const { mutate: updateMutate } = useMutate<
+    const { mutate: updateSubject } = useMutate<
         SingleSubjectApiResponse,
-        { name: string; description: string }
-    >(subjectUrl);
+        SubjectFormData
+    >();
 
-    const { mutate: createMutate } = useMutate<
+    const { mutate: createSubject } = useMutate<
         SingleSubjectApiResponse,
-        { name: string; description: string }
-    >("/api/admin/subjects");
+        SubjectFormData
+    >();
 
-    const { mutate: deleteMutate, loading: deleteLoading } = useMutate<any, null>();
+    const { mutate: createTask } = useMutate<any, TaskFormData>();
+
+    const { mutate: deleteSubject, loading: deleteLoading } = useMutate<any, null>();
 
     // Modal state
     const [isCreateOpen, setCreateOpen] = useState(false);
@@ -84,35 +92,27 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
 
     // Handle delete
     const handleDelete = async () => {
-            try {
-                await deleteMutate(subjectUrl,"DELETE", null, fetchOptions);
-
-                showToast({
-                    variant: "success",
-                    title: "Subject deleted successfully",
-                    autoClose: 500,
-                });
-
-                window.location.href = "/subjects";
-            } catch (error) {
-                showToast({
-                    variant: "error",
-                    title: "Delete failed",
-                    autoClose: 500,
-                });
-            }
+        try {
+            await deleteSubject(subjectUrl, "DELETE", null, fetchOptions);
+            showToast({
+                variant: "success",
+                message: "Successfully deleted",
+                autoClose: 500,
+            });
+            window.location.href = "/subjects";
+        } catch {
+            showToast({
+                variant: "error",
+                message: "Delete failed",
+                autoClose: 500,
+            });
+        }
     };
 
     // States
     if (subjectLoading) return <Spinner />;
-    if (subjectError) {
-        return (
-            <p className="error">Error: {String(subjectError)}</p>
-        )
-    }
-    if (!subject) {
-        return <p>No subject found for this ID.</p>
-    }
+    if (subjectError) return <p className="error">Error: {String(subjectError)}</p>;
+    if (!subject) return <p>No subject found for this ID.</p>;
 
     return (
         <div className="single-subject-container">
@@ -128,15 +128,11 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
 
             {/* Actions */}
             <div className="form-actions" style={{ marginTop: "1rem" }}>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => setEditOpen(true)}>
+                <button className="btn btn-primary" onClick={() => setEditOpen(true)}>
                     Edit Subject
                 </button>
 
-                <button
-                    className="btn btn-danger"
-                    onClick={() => setDeleteOpen(true)}>
+                <button className="btn btn-danger" onClick={() => setDeleteOpen(true)}>
                     Delete Subject
                 </button>
 
@@ -148,16 +144,16 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
                 </button>
             </div>
 
-            {/*Delete Confirm Modal*/}
+            {/* Delete Confirm Modal */}
             <DeleteConfirmModal
                 open={deleteOpen}
-                onClose={()=>setDeleteOpen(false)}
+                onClose={() => setDeleteOpen(false)}
                 onConfirm={handleDelete}
                 loading={deleteLoading}
                 message={"Do you really want to delete this subject?"}
             />
 
-            {/* Edit Modal */}
+            {/* Edit Subject Modal */}
             <Modal isOpen={isEditOpen} onClose={() => setEditOpen(false)}>
                 <h2>Edit Subject</h2>
                 <SubjectForm
@@ -167,27 +163,30 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
                     }}
                     submitLabel="Update Subject"
                     onSubmit={async (formData) => {
-                        await updateMutate(subjectUrl, "PUT", formData, fetchOptions);
+                        await updateSubject(subjectUrl, "PUT", formData, fetchOptions);
                         await subjectRefetch();
-                        showToast({ variant: "success", title: "Subject updated!" });
+                        showToast({
+                            variant: "success",
+                            message: "Subject updated!",
+                            autoClose: 300,
+                        });
                         setEditOpen(false);
                     }}
                 />
             </Modal>
 
-            {/* Create Modal */}
+            {/* Create Subject Modal */}
             <Modal isOpen={isCreateOpen} onClose={() => setCreateOpen(false)}>
                 <h2>Create Subject</h2>
                 <SubjectForm
                     submitLabel="Create Subject"
                     onSubmit={async (formData) => {
-                        await createMutate(
-                            "/api/admin/subjects",
-                            "POST",
-                            formData,
-                            fetchOptions
-                        );
-                        showToast({ variant: "success", title: "Subject created!" });
+                        await createSubject("/api/admin/subjects", "POST", formData, fetchOptions);
+                        showToast({
+                            variant: "success",
+                            message: "Subject created!",
+                            autoClose: 300,
+                        });
                         setCreateOpen(false);
                     }}
                 />
@@ -207,9 +206,13 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
                     }}
                     submitLabel="Create Task"
                     onSubmit={async (formData) => {
-                        await createMutate("/api/admin/tasks", "POST", formData, fetchOptions);
-                        await refetchTasks(); // refresh task list
-                        showToast({ variant: "success", title: "Task created!" });
+                        await createTask("/api/admin/tasks", "POST", formData, fetchOptions);
+                        await refetchTasks();
+                        showToast({
+                            variant: "success",
+                            message: "Task created!",
+                            autoClose: 300,
+                        });
                         setTaskCreateOpen(false);
                     }}
                 />
@@ -220,7 +223,7 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
             {/* Task List */}
             <div className="subject-task-container card">
                 <h2 className="tasks-title">Tasks</h2>
-                {tasksLoading && <Spinner/>}
+                {tasksLoading && <Spinner />}
                 {tasksError && (
                     <p className="error">Error fetching tasks: {String(tasksError)}</p>
                 )}
@@ -236,13 +239,12 @@ function SingleSubject({ subjectId }: SingleSubjectProps) {
                         >
                             <strong>{task.title}</strong>
                             <p>{task.description}</p>
-                            <small>Status: {task.status}</small>
                         </li>
                     ))}
                 </ul>
             </div>
 
-            {/* Task Modal */}
+            {/* Single Task Modal */}
             <Modal isOpen={!!selectedTaskId} onClose={() => setSelectedTaskId(null)}>
                 {selectedTaskId && <SingleTask id={selectedTaskId} />}
             </Modal>
