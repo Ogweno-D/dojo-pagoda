@@ -1,0 +1,90 @@
+/* Header */
+.header{
+    padding: 0;
+    grid-area: header;
+    background-color: hsl(191, 64%, 22%);
+    color: white;
+    height: 100%;
+}
+.navbar{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.navbar-item{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .2rem;
+    font-weight:400;
+    background:none;
+    outline: none;
+    border: none;
+
+}
+.navbar-item p{
+    padding: .8rem;
+}
+.navbar-brand{
+    width: 60px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px  solid white;
+    border-right: 1px  solid white;
+
+}
+.user-tag{
+    font-size: .6rem;
+    border-radius: 2px;
+    padding: .2rem
+}
+.vendor.user-tag{
+    background-color: #E7F5FF;
+    color:#228BE6;
+}
+.client.user-tag{
+    background-color: #FFF4E6;
+    color:#FD7E14;
+}
+
+.navbar-actions{
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 0 1rem;
+}
+.navbar-actions select{
+    width: 100%;
+    border: 2px solid darkgrey;
+    border-radius: 2px;
+    color: hsl(210, 14%, 80%);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    padding: 0.3rem 2rem 0.3rem 0.3rem;
+    position: relative;
+}
+.select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.select-wrapper select {
+    width: 100%;
+    padding: 0.3rem 2rem 0.3rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.select-wrapper .select-icon {
+    position: absolute;
+    right: 0.5rem;
+    pointer-events: none;
+    color: #868E96;
+}

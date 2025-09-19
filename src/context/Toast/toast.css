@@ -1,0 +1,149 @@
+.toast-container {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 9999;
+}
+
+/* Position variations */
+.toast-top-right {
+    top: 16px;
+    right: 16px;
+    align-items: flex-end;
+}
+
+.toast-top-left {
+    top: 16px;
+    left: 16px;
+    align-items: flex-start;
+}
+
+.toast-top-center {
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+}
+
+.toast-bottom-right {
+    bottom: 16px;
+    right: 16px;
+    align-items: flex-end;
+}
+
+.toast-bottom-left {
+    bottom: 16px;
+    left: 16px;
+    align-items: flex-start;
+}
+
+.toast-bottom-center {
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+}
+
+/* Base toast styles */
+.toast {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Keyframe Animations */
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Bottom positions use downward motion */
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutDown {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+/* Classes for triggering animation */
+.toast-enter {
+    animation: fadeInUp 0.3s ease forwards;
+}
+
+.toast-exit {
+    animation: fadeOutUp 0.3s ease forwards;
+}
+
+/* For bottom positions use downward animations */
+.toast-bottom-right.toast-enter,
+.toast-bottom-left.toast-enter,
+.toast-bottom-center.toast-enter {
+    animation: fadeInDown 0.3s ease forwards;
+}
+
+.toast-bottom-right.toast-exit,
+.toast-bottom-left.toast-exit,
+.toast-bottom-center.toast-exit {
+    animation: fadeOutDown 0.3s ease forwards;
+}
+@keyframes slideInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+}
+
+.toast-enter {
+    animation: slideInRight 0.3s ease forwards;
+}
+
+.toast-exit {
+    animation: slideOutRight 0.3s ease forwards;
+}

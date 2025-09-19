@@ -1,0 +1,117 @@
+/* General layout */
+.dashboard {
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+    background: #f9fafb;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    margin: 0;
+    color: #222;
+}
+
+.dashboard-header p {
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+/* Cards grid */
+.dashboard-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    margin-bottom: 2rem;
+}
+
+/* Card styles */
+.card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.card-header h3 {
+    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+.card-subtitle {
+    font-size: 0.85rem;
+    color: #888;
+    margin: 0;
+}
+
+.card-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #111;
+}
+
+.card-change {
+    font-size: 0.8rem;
+    color: green;
+    margin-top: 0.25rem;
+}
+
+/* Section grid */
+.dashboard-sections {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Activity list */
+.space-y > * + * {
+    margin-top: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dot-blue { background: #3b82f6; }
+.dot-green { background: #22c55e; }
+.dot-purple { background: #a855f7; }
+
+.activity-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    color: #333;
+}
+
+.activity-desc {
+    font-size: 0.75rem;
+    color: #777;
+    margin: 0.2rem 0 0 0;
+}
+
+/* Task list */
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.task-value {
+    font-weight: 500;
+    color: #222;
+}

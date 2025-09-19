@@ -1,0 +1,23 @@
+/* Footer*/
+.footer {
+    grid-area: footer;
+    background-color: #E0E9EB;
+    color: #144D5A;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2.5rem;
+    padding: 0.5rem;
+}
+.footer-item{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap:.6rem;
+}
+.footer-item p{
+    font-size: 1rem;
+    font-weight: bold;
+}
+

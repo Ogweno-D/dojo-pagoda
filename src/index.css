@@ -1,0 +1,56 @@
+@import '@mantine/core/styles.css';
+/*@import '@mantine/tiptap/styles.css';*/
+
+:root {
+    --font-family: 'Inter', sans-serif;
+}
+
+@font-face {
+    font-family: 'Lexend Deca';
+    src: url('./assets/fonts/LexendDeca-VariableFont_wght.ttf') format('truetype');
+    font-style: normal;
+    font-display: swap;
+}
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body{
+    font-family: Inter, Helvetica, sans-serif;
+    font-size: 16px;
+
+}
+.main-layout{
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: grid;
+    overflow: hidden;
+    grid-template-areas: 'header header header'
+                         'sidebar content content'
+                         'footer footer footer';
+
+    grid-template-rows: 48px 1fr 40px;
+    grid-template-columns: 200px 1fr ;
+    transition: grid-template-columns 0.2s ease-in-out ;
+}
+
+.main-layout.collapsed {
+    grid-template-columns: 60px 1fr;
+}
+
+/*Body*/
+.main-content-container {
+    grid-area: content;
+    background-color: #F7FCFD;
+    overflow: auto;
+}
+.main-content {
+    height: 100vh;
+    background-color: #F7FCFD;
+}
+.content-container{
+    height: 100%;
+}
