@@ -200,6 +200,7 @@ textarea:focus {
     color: white;
     border: 2px solid transparent;
     border-radius: 4px;
+    margin:6px;
 }
 .pagination-btn.disabled{
     opacity: 0.6;
