@@ -57,7 +57,8 @@ export default function Login() {
         if (email.includes("vendor")) role = "vendor";
 
         // Log in using the lean AuthContext
-        login({ role });
+        // For tokens
+        login("role")
 
         showToast({
             variant: "success",
