@@ -42,5 +42,5 @@ export type TableColumn<T extends object, K extends keyof T> = {
 
 export type TableColumnWithRowProps<T extends object> = TableColumn<T, keyof T> & {
     /** A function to apply custom properties to the table row based on row data. */
-    rowProps?: (rowData: T) => HTMLAttributes<HTMLTableRowElement>;
+    rowProps?: (rowData: T) => Partial<HTMLAttributes<HTMLTableRowElement>>;
 };

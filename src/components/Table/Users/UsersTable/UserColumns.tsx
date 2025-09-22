@@ -30,15 +30,16 @@ export function  useUserColumns() {
             id: "name",
             caption: "Name",
             render: (name) => <strong style={{ textDecoration: 'underline' }}>{name}</strong>,
-            rowProps: (user) => {
-                let backgroundColor = 'transparent';
-                if (user.status === 'approved') {
-                    backgroundColor = '#fca5a5';
-                }
-                return {
-                    style: { backgroundColor },
-                };
-            },
+
+            // rowProps: (user) => {
+            //     let backgroundColor = 'transparent';
+            //     if (user.status === 'approved') {
+            //         backgroundColor = '#f3eded';
+            //     }
+            //     return {
+            //         style: { backgroundColor },
+            //     };
+            // },
         }),
         createTableColumn<User>({
             id: "email",

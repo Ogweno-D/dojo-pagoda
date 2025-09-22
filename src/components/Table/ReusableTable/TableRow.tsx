@@ -1,5 +1,5 @@
-import type {TableColumn, TableColumnWithRowProps} from "./TableColumn.type.ts";
-import type {HTMLAttributes} from "react";
+import { type HTMLAttributes } from "react";
+import type { TableColumn, TableColumnWithRowProps } from "./TableColumn.type.ts";
 
 interface TableRowProps<T extends object> {
     row: T;
@@ -12,33 +12,50 @@ export function TableRow<T extends object>({
                                                row,
                                                columns,
                                                rowIndex,
-                                                onRowClick,
+                                               onRowClick,
                                            }: TableRowProps<T>) {
+    // Merge all rowProps across columns
+    const rowAttributes: HTMLAttributes<HTMLTableRowElement> = columns
+        .filter((col): col is TableColumnWithRowProps<T> =>
+            'rowProps' in col && typeof col.rowProps === 'function'
+        )
+        .reduce((acc, col) => {
+            const props = col.rowProps!(row);
 
-    const rowPropsColumn = columns.find((col): col is TableColumnWithRowProps<T> => 'rowProps' in col && typeof col.rowProps === 'function');
-    const rowAttributes: HTMLAttributes<HTMLTableRowElement> = rowPropsColumn?.rowProps?.(row) ?? {};
+            // Merge styles
+            if (props.style) {
+                acc.style = { ...acc.style, ...props.style };
+            }
+
+            // Merge className
+            if (props.className) {
+                acc.className = acc.className ? `${acc.className} ${props.className}` : props.className;
+            }
+
+            // Merge other props
+            Object.keys(props).forEach((key) => {
+                if (key !== 'style' && key !== 'className') {
+                    (acc as any)[key] = (props as any)[key];
+                }
+            });
+
+            return acc;
+        }, {} as HTMLAttributes<HTMLTableRowElement>);
 
     return (
         <tr
             key={rowIndex}
             {...rowAttributes}
-
             onClick={onRowClick ? () => onRowClick(row) : undefined}
             style={{
                 cursor: onRowClick ? 'pointer' : 'default',
+                ...rowAttributes.style,
             }}
         >
             {columns.map((col) => {
                 if (col.hide) return null;
 
-                const value =
-                    (col.id as string | number) in row
-                        ? (row as any)[col.id as keyof T]
-                        : undefined;
-
-                    // "id" in col && col.id in row
-                    //     ? (row as any)[col.id]
-                    //     : undefined;
+                const value = (col.id as string | number) in row ? (row as any)[col.id] : undefined;
 
                 return (
                     <td
@@ -47,23 +64,13 @@ export function TableRow<T extends object>({
                             textAlign: col.align,
                             padding: "8px",
                             borderBottom: "1px solid #eee",
-                            cursor: col.onClick ? "pointer": undefined,
+                            cursor: col.onClick ? "pointer" : undefined,
                         }}
-                        onClick={() => col.onClick?.(value,row,rowIndex)}
+                        onClick={() => col.onClick?.(value, row, rowIndex)}
                         ref={(el) => {
-                            if (el && col.onRendered) {
-                                col.onRendered(el, row);
-                            }
+                            if (el && col.onRendered) col.onRendered(el, row);
                         }}
                     >
-                        {/* * CORRECT: The render function receives three arguments:
-                         * 1. cellData: The value for the current cell.
-                         * 2. rowData: The entire row object.
-                         * 3. rowIndex: The index of the current row.
-                         * * Use col.render ? col.render(value, row, rowIndex) : value ?? "-".
-                         * If col.id doesn't exist in row (like in a generic "actions" column),
-                         * the first argument to render will be `undefined`, which is expected behavior.
-                         */}
                         {col.render ? col.render(value, row, rowIndex) : value ?? "-"}
                     </td>
                 );

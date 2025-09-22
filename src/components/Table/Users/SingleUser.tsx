@@ -1,9 +1,10 @@
-    import type {User} from "./User.type.ts";
+import type {User} from "./User.type.ts";
 import {useFetch} from "../../../hooks/api/useFetch.tsx";
 import {useMutate} from "../../../hooks/api/useMutate.tsx";
 import React, {useEffect, useState} from "react";
 import {useToast} from "../../../hooks/toast/useToast.tsx";
-    import Spinner from "../../Spinner/Spinner.tsx";
+import Spinner from "../../Spinner/Spinner.tsx";
+import "./userDetails.css"
 
 interface  SingleUserProps{
     id: number;
@@ -122,59 +123,71 @@ function SingleUser({id}: SingleUserProps) {
 
 
     return (
-        <div className="user-container">
-            <h1 className="user-title">User Details</h1>
+        <div className={"user-page"}>
+            <div className="user-container">
+                <h1 className="user-title">User Details</h1>
 
-            <div className="card">
-                <p><strong>Name:</strong> {user?.name}</p>
-                <p><strong>Email:</strong> {user?.email}</p>
-                <p><strong>Current Role:</strong> {user?.role}</p>
-                <p><strong>Current Status:</strong> {user?.status}</p>
+                <div className="card user-card">
+                    <div className="card-img">
+                        <img
+                            src={user?.avatar_url}
+                            alt={"Avatar"}
+                        />
+                    </div>
+                    <div className="card-body">
+                        <p><strong>Name:</strong> {user?.name}</p>
+                        <p><strong>Email:</strong> {user?.email}</p>
+                        <p><strong>Current Role:</strong> {user?.role}</p>
+                        <p><strong>Current Status:</strong> {user?.status}</p>
+                    </div>
+
+                </div>
+
+                <hr className="divider" />
+
+                <form onSubmit={handleUpdate} className="card form">
+                    <h2 className="form-title">Edit User</h2>
+
+                    <div className="form-group">
+                        <label>Role</label>
+                        <select value={role} onChange={(e) => setRole(e.target.value)}>
+                            <option value="trainee">Trainee</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Status</label>
+                        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                            <option value="approved">Approved</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+
+                    <div className="form-actions">
+                        <button
+                            type="submit"
+                            className="btn btn-primary"
+                            disabled={updateLoading}
+                        >
+                            {updateLoading ? "Updating..." : "Update User"}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleDelete}
+                            className="btn btn-danger"
+                            disabled={deleteLoading}
+                        >
+                            {deleteLoading ? "Deleting..." : "Delete User"}
+                        </button>
+                    </div>
+                </form>
+
+                {updateError && <p className="error-text"> Update failed: {String(updateError)}</p>}
+                {deleteError && <p className="error-text">Delete failed: {String(deleteError)}</p>}
             </div>
-
-            <hr className="divider" />
-
-            <form onSubmit={handleUpdate} className="card form">
-                <h2 className="form-title">Edit User</h2>
-
-                <div className="form-group">
-                    <label>Role</label>
-                    <select value={role} onChange={(e) => setRole(e.target.value)}>
-                        <option value="trainee">Trainee</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-
-                <div className="form-group">
-                    <label>Status</label>
-                    <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                        <option value="approved">Approved</option>
-                        <option value="pending">Pending</option>
-                    </select>
-                </div>
-
-                <div className="form-actions">
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={updateLoading}
-                    >
-                        {updateLoading ? "Updating..." : "Update User"}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleDelete}
-                        className="btn btn-danger"
-                        disabled={deleteLoading}
-                    >
-                        {deleteLoading ? "Deleting..." : "Delete User"}
-                    </button>
-                </div>
-            </form>
-
-            {updateError && <p className="error-text"> Update failed: {String(updateError)}</p>}
-            {deleteError && <p className="error-text">Delete failed: {String(deleteError)}</p>}
         </div>
+
     );
 
 }
