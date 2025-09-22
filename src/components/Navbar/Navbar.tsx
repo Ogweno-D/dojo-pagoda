@@ -27,9 +27,6 @@ export  default function  Navbar() {
         <nav className="navbar">
             <div className="navbar-item">
                 <div className="">
-                    <Icon>
-
-                    </Icon>
                 </div>
                 <p> </p>
                 <span >
