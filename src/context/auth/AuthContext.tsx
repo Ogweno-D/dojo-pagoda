@@ -9,7 +9,8 @@ interface SingleUserApiResponse {
 type AuthContextType = {
     user: User | null;
     loading: boolean;
-    refetchUser: () => Promise<void>;
+    error: Error | null;
+    refetchUser: () => Promise<() => void>;
     login: (token: string) => void;
     logout: () => void;
     isAuthenticated: () => boolean;
@@ -45,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const login = (token: string) => {
         localStorage.setItem("token", token);
-        refetchUser();
+        refetchUser;
     };
 
     const logout = () => {
@@ -58,6 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const value: AuthContextType = {
         user,
         loading,
+        error,
         refetchUser,
         login,
         logout,
