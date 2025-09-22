@@ -23,7 +23,7 @@ export const useFetch = <T,>( url:string, options={}) => {
                     headers:{
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
-                        ...options.headers,
+                        ...options,
                     }
                 });
 
