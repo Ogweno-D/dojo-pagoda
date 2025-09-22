@@ -33,15 +33,29 @@ function RouteComponent() {
 }
 
 function UserTableWrapper() {
-  const {page, pageSize, setData} = useDataTable<User>()
+  const {page, pageSize, setData,setPage} = useDataTable<User>()
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
+  const [debouncedSearch, setDebouncedSearch] = useState<string>(searchQuery);
+
+  //Debounce the input
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 1000);
+    return ()=> clearTimeout(t);
+  }, [searchQuery]);
+
+  //Decounced search
+  useEffect(()=>{
+    setPage(1);
+  },[debouncedSearch,setPage])
+
+
   const params = {
     page,
     page_size: pageSize,
-    search: searchQuery,
+    ...(debouncedSearch ? { search:debouncedSearch } :{}),
     role: roleFilter,
     status: statusFilter,
   }
@@ -59,7 +73,18 @@ function UserTableWrapper() {
 
   return(
       <>
-        <UserTable loading={loading} error={error} data={data}/>
+        <UserTable
+            loading={loading}
+            error={error}
+            data={data}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            roleFilter={roleFilter}
+            setRoleFilter={setRoleFilter}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+
+        />
         <PaginationWrapper data={data} />
         </>
   );

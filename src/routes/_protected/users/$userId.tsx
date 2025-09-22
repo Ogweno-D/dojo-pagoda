@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_protected/users/$userId')({
 
 function RouteComponent() {
     const {userId} = Route.useParams();
-    const uid = atob(userId);
+    const uid = Number(atob(userId));
   return (
       <div>
           <SingleUser id={uid}  />

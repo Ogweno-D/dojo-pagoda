@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_protected/subjects/$subjectId')({
 
 function RouteComponent() {
     const {subjectId} = Route.useParams();
-    const suid = atob(subjectId);
+    const suid = Number(atob(subjectId));
     return (
         <div>
             <SingleSubject subjectId={suid}  />

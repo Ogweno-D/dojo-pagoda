@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_protected/tasks/$taskId')({
 function RouteComponent() {
 
     const {taskId} = Route.useParams();
-    const tId = atob(taskId);
+    const tId = Number(atob(taskId));
 
   return (
     <SingleTask id={tId} />
