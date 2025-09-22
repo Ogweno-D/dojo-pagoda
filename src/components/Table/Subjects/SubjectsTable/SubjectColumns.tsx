@@ -19,7 +19,7 @@ export function useSubjectColumns(){
                 // },
             }),
         createTableColumn<Subject>({
-            id: "subject_name",
+            id: "name",
             caption: "Name",
             size: 80,
         }),

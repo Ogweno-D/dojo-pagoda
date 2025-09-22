@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./settings.css";
 import { useAuth } from "../../context/auth/AuthContext.tsx";
 import { useMutate } from "../../hooks/api/useMutate.tsx";
@@ -12,11 +12,13 @@ function Settings() {
     const { user, loading, error, refetchUser } = useAuth();
     const showToast = useToast();
 
+    const url = `/api/admin/users/profile`
+
     // Mutate hook for profile update
     const { mutate: updateMutate, loading: updateLoading } = useMutate<
         { user: any; message: string }, // Response shape
         { name: string; email: string } // Request body shape
-    >(`/api/admin/users/profile`);
+    >();
 
     const [name, setName] = useState(user?.name ?? "");
     const [email, setEmail] = useState(user?.email ?? "");
@@ -39,11 +41,11 @@ function Settings() {
 
     const handleSaveProfile = async () => {
         try {
-            await updateMutate(`/api/admin/users/profile`, "PUT", { name, email });
-            await refetchUser(); // refresh context data
-            showToast({ variant: "success", title: "Profile updated successfully!" });
+            await updateMutate(url, "PUT", { name, email });
+            await refetchUser();
+            showToast({ variant: "success", message: "Profile updated successfully!" });
         } catch (err) {
-            showToast({ variant: "error", title: "Failed to update profile" });
+            showToast({ variant: "error", message: "Failed to update profile" });
         }
     };
 

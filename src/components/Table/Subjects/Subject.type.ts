@@ -1,6 +1,6 @@
 export interface Subject {
     id: number;
-    subject_name: string;
+    name: string;
     description: string;
     created_by: number;
     created_at: string;

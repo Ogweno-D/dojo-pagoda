@@ -55,9 +55,13 @@ function TaskTable({ loading, error, data }: TaskTableProps) {
 
             {tasks.length > 0 ? (
                 <>
-                    <div style={{ display: "flex", flexDirection: "row" }}>
-                        <FilterManager columns={columns}/>
-                        <SortManager columns={columns}/>
+                    <div style={{ display: "flex", flexDirection: "row", justifyContent:"end"}}>
+                        <div>
+                            <FilterManager columns={columns}/>
+                        </div>
+                        <div>
+                            <SortManager columns={columns}/>
+                        </div>
                     </div>
                     <Table
                         tableId="tasksTable"

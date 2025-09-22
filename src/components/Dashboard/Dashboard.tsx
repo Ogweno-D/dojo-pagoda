@@ -1,13 +1,50 @@
 import { Card } from "./Card.tsx";
 import "./dashboard.css";
+import type {User} from "../Table/Users/User.type.ts";
+import { useFetch } from "../../hooks/api/useFetch.tsx";
+import type {UserApiResponse} from "../../routes/_protected/users";
+import type {SubjectApiResponse} from "../../routes/_protected/subjects";
+import type {Subject} from "../Table/Subjects/Subject.type.ts";
+import type {TaskApiResponse} from "../../routes/_protected/tasks";
+import type {Task} from "../Table/Tasks/Task.type.ts";
 
 function Dashboard(){
+
+    const {data} = useFetch<UserApiResponse>(   `api/admin/users/?page=1&pageSize=20`, {
+        headers: {"Content-Type": "application/json"}
+    });
+    const users: User[] = data?.records ?? [];
+
+    const {data:subjectData} = useFetch<SubjectApiResponse>(   `api/admin/subjects/?page=1&pageSize=20`, {
+        headers: {"Content-Type": "application/json"}
+    });
+    const subjects: Subject[] = subjectData?.records ?? [];
+
+    const {data:taskData} = useFetch<TaskApiResponse>(   `api/admin/tasks`, {
+        headers: {"Content-Type": "application/json"}
+    });
+    const tasks: Task[] = taskData?.records ?? [];
+
+    // Computations
+    const totalUsers = users.length;
+
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+    const activeSubjects = subjects.filter((s) => new Date(s.created_at) >= twoWeeksAgo).length;
+
+    const totalTasks = tasks.length;
+
+    const completedTasks = tasks.filter((t) => t.is_active).length;
+
+
     const stats = [
-        { title: "Total Users", value: 120, change: "+12%" },
-        { title: "Active Subjects", value: 35, change: "+3%" },
-        { title: "Total Tasks", value: 220, change: "+8%" },
-        { title: "Completed Tasks", value: 150, change: "+15%" },
+        { title: "Total Users", value: totalUsers, change: "+12%" },
+        { title: "Active Subjects", value: activeSubjects, change: "+3%" },
+        { title: "Total Tasks", value: totalTasks, change: "+8%" },
+        { title: "Completed Tasks", value: completedTasks, change: "+15%" },
     ];
+
 
     const activities = [
         { type: "blue", title: "New user registered", desc: "David Brown joined 2 hours ago" },
@@ -80,6 +117,6 @@ function Dashboard(){
             </section>
         </div>
     );
-};
+}
 
 export  default Dashboard;

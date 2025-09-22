@@ -1,7 +1,7 @@
 import type { TableColumn } from "./TableColumn.type";
 
 interface TableHeaderProps<T extends object> {
-    columns: TableColumn<T>[];
+    columns: TableColumn<T,any>[];
 }
 
 export function TableHeader<T extends object>({ columns }: TableHeaderProps<T>) {

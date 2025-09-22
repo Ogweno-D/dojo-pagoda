@@ -7,7 +7,7 @@ import {useDataTable} from "../providers/DataTableProvider.tsx";
 interface TableProps<T extends object> {
     tableId: string;
     columns: TableColumn<T, any>[];
-    onRowClick: (row: T) => void;
+    onRowClick?: (row: T) => void;
 }
 
 export function Table<T extends object>({ tableId, columns, onRowClick}: TableProps<T>) {

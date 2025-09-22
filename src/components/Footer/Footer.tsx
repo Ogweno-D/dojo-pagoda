@@ -4,7 +4,7 @@ import "./footer.css"
 import {useAuth} from "../../context/auth/AuthContext.tsx";
 export function Footer() {
 
-    const { user, loading, error, refetchUser } = useAuth();
+    const { user } = useAuth();
 
     return (
         <div className= "footer">

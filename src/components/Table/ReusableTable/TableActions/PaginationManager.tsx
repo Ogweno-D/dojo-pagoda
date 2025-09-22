@@ -9,7 +9,7 @@ interface PaginationProps<T extends object>  {
 }
 
 function PaginationManager<T extends object>({ columns, totalCount }: PaginationProps<T>) {
-    const { filteredAndSortedData, page, setPage, pageSize, setPageSize } =
+    const { page, setPage, pageSize, setPageSize } =
         useDataTable<T>();
 
     const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
@@ -18,7 +18,6 @@ function PaginationManager<T extends object>({ columns, totalCount }: Pagination
         <>
             <Table<T>
                 tableId="peopleTable"
-                data={filteredAndSortedData}
                 columns={columns}
             />
 

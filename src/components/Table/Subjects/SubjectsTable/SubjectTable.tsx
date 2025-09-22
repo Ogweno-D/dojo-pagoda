@@ -74,9 +74,13 @@ function SubjectTable({loading, error, data}: SubjectTableProps) {
             {subjects.length> 0 ? (
                 <>
                     <div>
-                        <div style={{ display: "flex", flexDirection: "row" }}>
-                            <FilterManager columns={columns}/>
-                            <SortManager columns={columns}/>
+                        <div style={{ display: "flex", flexDirection: "row", justifyContent:"end"}}>
+                            <div>
+                                <FilterManager columns={columns}/>
+                            </div>
+                            <div>
+                                <SortManager columns={columns}/>
+                            </div>
                         </div>
                         <Table
                             tableId="usersTable"
@@ -84,9 +88,6 @@ function SubjectTable({loading, error, data}: SubjectTableProps) {
                             onRowClick={handleRowClick}
                         />
                     </div>
-
-
-
 
                     {/* Create Modal */}
                     <Modal isOpen={isCreateOpen} onClose={() => setCreateOpen(false)}>
@@ -108,7 +109,6 @@ function SubjectTable({loading, error, data}: SubjectTableProps) {
                             }}
                         />
                     </Modal>
-
                 </>
             ) : (
                 <p>No users found.</p>

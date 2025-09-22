@@ -1,5 +1,5 @@
-import React from "react";
 import {Modal} from "../Modal.tsx";
+import Spinner from "../../Spinner/Spinner.tsx";
 
 interface DeleteConfirmModalProps {
     open: boolean;
@@ -19,7 +19,10 @@ export function DeleteConfirmModal({
                                        message = "Are you sure you want to delete this item?",
                                    }: DeleteConfirmModalProps) {
     return (
-        <Modal open={open} onClose={onClose} title={title}>
+        <Modal isOpen={open} onClose={onClose}>
+            <div className="modal-header">
+                <h3>{title}</h3>
+            </div>
             <p>{message}</p>
             <div className="modal-actions">
                 <button className="btn-secondary" onClick={onClose}>
@@ -30,7 +33,7 @@ export function DeleteConfirmModal({
                     onClick={onConfirm}
                     disabled={loading}
                 >
-                    {loading ? "Deleting..." : "Delete"}
+                    {loading ? <Spinner /> : "Delete"}
                 </button>
             </div>
         </Modal>

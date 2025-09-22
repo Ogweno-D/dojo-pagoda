@@ -38,7 +38,8 @@ export function FilterManager({columns}: FilterManagerProps){
     return (
         <>
             <div className={"table-actions"}>
-                <div className="filter-sort-btn" onClick={() => setIsOpen(true)}>
+                <div className="filter-sort-btn"
+                     onClick={() => setIsOpen(true)}>
                     {filters.length > 0 ? (
                         <div className="active-tag" data-type="filter">
                             <div className="tag-number">

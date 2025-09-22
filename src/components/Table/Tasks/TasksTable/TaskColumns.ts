@@ -1,9 +1,7 @@
-import {useNavigate} from "@tanstack/react-router";
 import {createTableColumn} from "../../ReusableTable/TableColumn.ts";
 import type {Task} from "../Task.type.ts";
 
 export function useTaskColumns(){
-    const navigate = useNavigate();
 
     return [
         createTableColumn<Task>({

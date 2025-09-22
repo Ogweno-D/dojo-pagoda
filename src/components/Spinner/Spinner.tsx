@@ -1,4 +1,3 @@
-import React from "react";
 import "./spinner.css";
 
 export default function Spinner({ size = 40 }: { size?: number }) {

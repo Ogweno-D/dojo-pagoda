@@ -7,12 +7,19 @@ import type { UserApiResponse } from "../../../../routes/_protected/users";
 import {FilterManager} from "../../ReusableTable/TableActions/FilterManager.tsx";
 import {SortManager} from "../../ReusableTable/TableActions/SortManager.tsx";
 
-interface UserTableProps{
+export interface UserTableProps {
     loading: boolean;
-    error:unknown;
+    error: unknown;
     data: UserApiResponse | null;
+    searchQuery: string;
+    setSearchQuery: (v: string) => void;
+    roleFilter: string;
+    setRoleFilter: (v: string) => void;
+    statusFilter: string;
+    setStatusFilter: (v: string) => void;
 }
-function UserTable({loading, error, data}: UserTableProps) {
+
+function UserTable({loading, error, data,searchQuery,setSearchQuery,roleFilter,setRoleFilter,setStatusFilter,statusFilter}: UserTableProps) {
 
     const navigate = useNavigate();
 
@@ -45,41 +52,46 @@ function UserTable({loading, error, data}: UserTableProps) {
             <div>
                 <h1>Users</h1>
                 {/* Filter and Search Controls */}
-                {/*<div className="form-controls">*/}
-                {/*    <div className={"form-search"}>*/}
-                {/*        <input*/}
-                {/*            type="text"*/}
-                {/*            placeholder="Search by name or email"*/}
-                {/*            value={searchQuery}*/}
-                {/*            onChange={(e) => setSearchQuery(e.target.value)}*/}
-                {/*        />*/}
-                {/*    </div>*/}
+                <div className="form-controls">
+                    <div className="form-search">
+                        <input
+                            type="search"
+                            placeholder="Search by name or email"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            aria-label="Search users"
+                            style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #ccc" }}
+                        />
+                    </div>
 
-                {/*    <div className={"form-filters"}>*/}
-                {/*        <select value={roleFilter} onChange={(e) =>  setRoleFilter(e.target.value)}>*/}
-                {/*            <option value="">All Roles</option>*/}
-                {/*            <option value="admin">Admin</option>*/}
-                {/*            <option value="trainee">Trainee</option>*/}
-                {/*        </select>*/}
-                {/*        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>*/}
-                {/*            <option value="">All Statuses</option>*/}
-                {/*            <option value="approved">Approved</option>*/}
-                {/*            <option value="rejected">Rejected</option>*/}
-                {/*            <option value="pending">Pending</option>*/}
-                {/*        </select>*/}
-                {/*    </div>*/}
-
-                {/*</div>*/}
+                    <div className="form-filters">
+                        <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
+                            <option value="">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="trainee">Trainee</option>
+                        </select>
+                        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                            <option value="">All Statuses</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
 
             {users.length> 0 ? (
                 <div className={"results-table"}>
-                    <div style={{ display: "flex", flexDirection: "row" }}>
-                        <FilterManager columns={columns}/>
-                        <SortManager columns={columns}/>
-                    </div>
 
+                    <div style={{ display: "flex", flexDirection: "row",alignItems:"center", justifyContent:"end"}}>
+                        <div>
+                            <FilterManager columns={columns}/>
+                        </div>
+                        <div>
+                            <SortManager columns={columns}/>
+                        </div>
+                    </div>
                     <Table
                         tableId={"usersTable"}
                         columns={columns}

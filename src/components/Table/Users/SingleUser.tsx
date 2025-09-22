@@ -40,8 +40,8 @@ function SingleUser({id}: SingleUserProps) {
 
     //  Mutation hooks for the updating and deleting
     const {mutate: updateMutate, loading: updateLoading, error: updateError } =
-        useMutate<SingleUserApiResponse, {role: string; status: string}>();
-    const { mutate: deleteMutate, loading: deleteLoading, error: deleteError } = useMutate<any, null>(url);
+        useMutate<SingleUserApiResponse, {role?: string; status?: string}>();
+    const { mutate: deleteMutate, loading: deleteLoading, error: deleteError } = useMutate<any, null>();
 
     // Updating the form inputs
     const [role, setRole] = useState<string>("");
@@ -74,13 +74,13 @@ function SingleUser({id}: SingleUserProps) {
 
             showToast({
                 variant: "success",
-                title: "Update successfully",
+                message: "Update successfully",
                 autoClose: 500
             })
         } catch (error) {
             showToast({
                 variant: 'error',
-                title:"Error updating the details",
+                message:"Error updating the details",
                 autoClose: 500
             })
         }
@@ -110,7 +110,7 @@ function SingleUser({id}: SingleUserProps) {
 
     //
     if (loading) return<Spinner/>;
-    if (error) return <p className="error">Error fetching user: {String(userError)}</p>;
+    if (error) return <p className="error">Error fetching user: {String(error)}</p>;
 
     if (!user) {
         return (

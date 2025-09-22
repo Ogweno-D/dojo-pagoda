@@ -174,3 +174,10 @@
     align-items: center;
     justify-content: start;
 }
+
+.filter-icon,.sort-icon{
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
