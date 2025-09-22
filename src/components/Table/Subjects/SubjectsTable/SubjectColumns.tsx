@@ -1,26 +1,25 @@
 import {createTableColumn} from "../../ReusableTable/TableColumn.ts";
 import type {Subject} from "../Subject.type.ts";
-import {useNavigate} from "@tanstack/react-router";
+// import {useNavigate} from "@tanstack/react-router";
 
 export function useSubjectColumns(){
-    const navigate  = useNavigate();
+    // const navigate  = useNavigate();
 
     return [
         createTableColumn<Subject>({
                 id: "id",
                 caption: "Subject ID",
                 size: 80,
-                onClick: (id) => {
-                    const encodedId = btoa(id);
-                    navigate({
-                        to: "/subject/subjectId ",
-                        params: {userId: encodedId}
-                    })
-
-                },
+                // onClick: (id) => {
+                //     const encodedId = btoa(String(id));
+                //     navigate({
+                //         to: "/subject/$subjectId ",
+                //         params: {subjectId: encodedId}
+                //     })
+                // },
             }),
         createTableColumn<Subject>({
-            id: "name",
+            id: "subject_name",
             caption: "Name",
             size: 80,
         }),

@@ -4,6 +4,8 @@ import { useTaskColumns } from "./TaskColumns.ts";
 import { UserTableSkeleton } from "../../Users/UsersTable/userTableSkeleton.tsx";
 import { Table } from "../../ReusableTable/Table.tsx";
 import "../task.css";
+import {FilterManager} from "../../ReusableTable/TableActions/FilterManager.tsx";
+import {SortManager} from "../../ReusableTable/TableActions/SortManager.tsx";
 interface TaskApiResponse {
     domain: string;
     current_page: number;
@@ -53,7 +55,15 @@ function TaskTable({ loading, error, data }: TaskTableProps) {
 
             {tasks.length > 0 ? (
                 <>
-                    <Table tableId="tasksTable" columns={columns} onRowClick={handleRowClick} />
+                    <div style={{ display: "flex", flexDirection: "row" }}>
+                        <FilterManager columns={columns}/>
+                        <SortManager columns={columns}/>
+                    </div>
+                    <Table
+                        tableId="tasksTable"
+                        columns={columns}
+                        onRowClick={handleRowClick}
+                    />
                 </>
             ) : (
                 <div className="no-data-error">

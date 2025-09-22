@@ -1,18 +1,16 @@
     import React, { useEffect, useState } from "react";
-    import type { Subject } from "./Subject.type.ts";
+    import type {Subject} from "../Table/Subjects/Subject.type.ts";
 
     interface SubjectFormProps {
         initialData?: Partial<Subject>;
         onSubmit: (data: { name: string; description: string }) => Promise<void> | void;
         submitLabel?: string;
-        refetch?: () => void;
     }
 
     function SubjectForm({
                              initialData,
                              onSubmit,
                              submitLabel = "Create Subject",
-        refetch,
                          }: SubjectFormProps) {
         const [formData, setFormData] = useState<{ name: string; description: string }>({
             name: "",
@@ -41,10 +39,6 @@
         const handleSubmit = async (e: React.FormEvent) => {
             e.preventDefault();
             await onSubmit(formData);
-
-            if(refetch){
-               await refetch();
-            }
         };
 
         return (

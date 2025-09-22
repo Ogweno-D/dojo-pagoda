@@ -1,6 +1,4 @@
 import  { useState } from "react";
-import { useFetch } from "../../../../hooks/api/useFetch.tsx";
-import { buildQueryParams } from "../../../../utils/queryParams.ts";
 import type { Subject } from "../Subject.type.ts";
 import {Table} from "../../ReusableTable/Table.tsx";
 import {useNavigate} from "@tanstack/react-router";
@@ -12,47 +10,25 @@ import {useMutate} from "../../../../hooks/api/useMutate.tsx";
 import {useToast} from "../../../../hooks/toast/useToast.tsx";
 import type {SingleSubjectApiResponse} from "../SingleSubject.tsx";
 import {FilterManager} from "../../ReusableTable/TableActions/FilterManager.tsx";
-import {DataTableProvider} from "../../providers/DataTableProvider.tsx";
 import { SortManager } from "../../ReusableTable/TableActions/SortManager.tsx";
+import type {SubjectApiResponse} from "../../../../routes/_protected/subjects";
 
-interface SubjectApiResponse {
-    records: Subject[];
-    domain: string;
-    current_page: number;
-    total_count: number;
-    last_page: number;
+interface SubjectTableProps {
+    loading: boolean;
+    error: unknown;
+    data: SubjectApiResponse | null;
 }
 
-function SubjectTable() {
+function SubjectTable({loading, error, data}: SubjectTableProps) {
 
     const navigate = useNavigate();
     const showToast = useToast();
 
-
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
     const columns = useSubjectColumns();
 
     const [isCreateOpen, setCreateOpen] = useState(false);
 
-    // Params
-    const params = {
-        page,
-        pageSize,
-    };
 
-    const url = `/api/admin/subjects/${buildQueryParams(params)}`;
-
-    const fetchOptions = {
-        headers: {
-            "Content-Type": "application/json",
-        },
-    };
-
-    const { data, loading, error , refetch: refetchSubjects} = useFetch<SubjectApiResponse>(
-        url,
-        fetchOptions
-    );
 
     const subjects: Subject[] = data?.records ?? [];
 
@@ -69,7 +45,6 @@ function SubjectTable() {
     if (error) {
         return <p className="error">Error: {String(error)}</p>;
     }
-
 
 
     // Handle a whole row click
@@ -96,65 +71,22 @@ function SubjectTable() {
                 </div>
             </div>
 
-            {error && <div className="error">{String(error)}</div>}
-
             {subjects.length> 0 ? (
                 <>
-                    <DataTableProvider data={subjects} initialState={{ filters: [], sorts: [], page: 1, pageSize: 5 }}>
-                        <FilterManager columns={columns} />
-                        <SortManager columns={columns} />
+                    <div>
+                        <div style={{ display: "flex", flexDirection: "row" }}>
+                            <FilterManager columns={columns}/>
+                            <SortManager columns={columns}/>
+                        </div>
                         <Table
                             tableId="usersTable"
-                            data={subjects}
                             columns={columns}
                             onRowClick={handleRowClick}
                         />
-                    </DataTableProvider>
-
-
-                    {/* Pagination Controls */}
-                    <div className={"table-footer"}>
-                        <div className="table-pagination">
-                            <div>
-                                <button
-                                    className={`pagination-btn ${page === 1 ? "disabled" : ""}`}
-                                    onClick={() => setPage(page - 1)}
-                                    disabled={page === 1}
-                                >
-                                    Previous
-                                </button>
-                                <span style={{ marginLeft: "5px" }}>
-                                 Page{" "}
-                                    <strong>
-                                    {data?.current_page ?? 1} of {data?.last_page ?? 1}
-                                    </strong>{" "}
-                                    {/*(Total Records: {data?.total_count ?? 0})*/}
-                                 </span>
-                                <button
-                                    className={`pagination-btn ${page === (data?.last_page ?? 1) ? "disabled" : ""}`}
-                                    onClick={() => setPage(page + 1)}
-                                    disabled={page === (data?.last_page ?? 1)}
-                                >
-                                    Next
-                                </button>
-                            </div>
-
-                            <div>
-                                <select
-                                    value={pageSize}
-                                    onChange={(e) => {
-                                        setPageSize(Number(e.target.value));
-                                        setPage(1);
-                                    }}
-                                >
-                                    <option value={5}>5 per page</option>
-                                    <option value={10}>10 per page</option>
-                                    <option value={20}>20 per page</option>
-                                </select>
-                            </div>
-
-                        </div>
                     </div>
+
+
+
 
                     {/* Create Modal */}
                     <Modal isOpen={isCreateOpen} onClose={() => setCreateOpen(false)}>
@@ -166,7 +98,6 @@ function SubjectTable() {
                                     "/api/admin/subjects",
                                     "POST",
                                     formData,
-                                    fetchOptions
                                 );
                                 setCreateOpen(false);
                                 showToast({
@@ -175,7 +106,6 @@ function SubjectTable() {
                                     autoClose: 500
                                 });
                             }}
-                            refetch={refetchSubjects}
                         />
                     </Modal>
 

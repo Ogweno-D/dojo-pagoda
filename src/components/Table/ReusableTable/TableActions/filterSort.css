@@ -1,4 +1,5 @@
-.modal-overlay {
+
+.table-actions .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -10,10 +11,10 @@
     align-items: center;
     z-index: 9999;
 }
-.modal-overlay.open {
+.table-actions .modal-overlay.open {
     display: flex;
 }
-.modal {
+.table-actions .modal {
     padding: 0;
     margin: 0;
     background: #fff;
@@ -29,7 +30,7 @@
     overflow: hidden; /* prevent body from overflowing into header/footer */
 }
 
-.modal-header {
+.table-actions .modal-header {
     background: teal;
     color: hsl(180, 100%, 99%);
     display: flex;
@@ -46,7 +47,7 @@
     z-index: 2;
 }
 
-.modal-body {
+.table-actions .modal-body {
     background: white;
     flex: 1;
     display: flex;
@@ -57,7 +58,7 @@
     width: 100%;
 }
 
-.modal-footer {
+.table-actions .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
@@ -147,10 +148,11 @@
     display: flex;
     align-items: center;
     gap:.5rem;
+    padding: .2rem;
     background: teal;
     border-radius: 2px;
     color: white;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 500;
 
 }

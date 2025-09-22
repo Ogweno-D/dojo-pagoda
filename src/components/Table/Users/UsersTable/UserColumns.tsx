@@ -34,8 +34,6 @@ export function  useUserColumns() {
                 let backgroundColor = 'transparent';
                 if (user.status === 'approved') {
                     backgroundColor = '#fca5a5';
-                } else if (user.status === 'approved') {
-                    backgroundColor = '#bfdbfe';
                 }
                 return {
                     style: { backgroundColor },

@@ -35,6 +35,7 @@ export function SortManager({columns}: SortManagerProps) {
     }, []);
     return (
         <>
+            <div className={"table-actions"}>
             <div className="filter-sort-btn" onClick={() => setIsOpen(true)}>
                 {sorts.length > 0 ? (
                     <div className="active-tag" data-type="sort">
@@ -126,6 +127,7 @@ export function SortManager({columns}: SortManagerProps) {
                         <button onClick={() => {setIsOpen(false); applyRules();}}>Apply</button>
                     </div>
                 </div>
+            </div>
             </div>
         </>
     );

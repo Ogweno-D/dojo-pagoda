@@ -1,18 +1,17 @@
 import { useDataTable } from "../../providers/DataTableProvider.tsx";
-import type { Task } from "../../Tasks/Task.type.ts";
 import "../table.css";
 
-interface PaginationWrapperProps {
+interface PaginationWrapperProps<T> {
     data: {
-        domain: string | undefined;
-        current_page: number | undefined;
-        last_page: number | undefined;
-        page_size: number | undefined;
-        records: Task[] | undefined;
+        domain?: string;
+        current_page?: number;
+        last_page?: number;
+        page_size?: number;
+        records?: T[];
     } | null;
 }
 
-function PaginationWrapper({ data }: PaginationWrapperProps) {
+function PaginationWrapper<T>({ data }: PaginationWrapperProps<T>) {
     const { page, setPage, pageSize, setPageSize } = useDataTable();
 
     const handlePrev = () => {
