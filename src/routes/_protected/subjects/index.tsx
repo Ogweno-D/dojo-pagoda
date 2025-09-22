@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import SubjectTable from "../../../components/Table/Subjects/SubjectsTable/SubjectTable.tsx";
 import type {Subject} from "../../../components/Table/Subjects/Subject.type.ts";
 import {DataTableProvider, useDataTable} from "../../../components/Table/providers/DataTableProvider.tsx";
-import type {Task} from "../../../components/Table/Tasks/Task.type.ts";
 import {buildQueryParams} from "../../../utils/queryParams.ts";
 import {useFetch} from "../../../hooks/api/useFetch.tsx";
 import {useEffect} from "react";
@@ -22,7 +21,7 @@ export const Route = createFileRoute('/_protected/subjects/')({
 
 function RouteComponent() {
     return (
-        <DataTableProvider<Task>
+        <DataTableProvider<Subject>
             data={[]}
             initialState={{ filters: [], sorts: [], page: 1, pageSize: 5 }}
         >
@@ -34,7 +33,7 @@ function SubjectTableWrapper() {
     const { page, pageSize, setData} = useDataTable<Subject>();
 
     const params = { page, page_size: pageSize };
-    const url = `/api/admin/tasks${buildQueryParams(params)}`;
+    const url = `/api/admin/subjects/${buildQueryParams(params)}`;
 
     const { data, loading, error } = useFetch<SubjectApiResponse>(url, {
         headers: { "Content-Type": "application/json" },
