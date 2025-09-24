@@ -9,14 +9,14 @@ import SubjectForm from "../../../Forms/SubjectForm.tsx";
 import {useMutate} from "../../../../hooks/api/useMutate.tsx";
 import {useToast} from "../../../../hooks/toast/useToast.tsx";
 import type {SingleSubjectApiResponse} from "../SingleSubject.tsx";
-import {FilterManager} from "../../ReusableTable/TableActions/FilterManager.tsx";
-import { SortManager } from "../../ReusableTable/TableActions/SortManager.tsx";
 import type {SubjectApiResponse} from "../../../../routes/_protected/subjects";
+import {TableActions} from "../../ReusableTable/TableActions/TableActions.tsx";
+import {DataTableProvider} from "../../providers/DataTableProvider.tsx";
 
 interface SubjectTableProps {
     loading: boolean;
     error: unknown;
-    data: SubjectApiResponse | null;
+    data: SubjectApiResponse | undefined;
 }
 
 function SubjectTable({loading, error, data}: SubjectTableProps) {
@@ -73,21 +73,18 @@ function SubjectTable({loading, error, data}: SubjectTableProps) {
 
             {subjects.length> 0 ? (
                 <>
-                    <div>
-                        <div style={{ display: "flex", flexDirection: "row", justifyContent:"end"}}>
-                            <div>
-                                <FilterManager columns={columns}/>
-                            </div>
-                            <div>
-                                <SortManager columns={columns}/>
-                            </div>
+                    <DataTableProvider<Subject> data={subjects}>
+                        <div>
+                            <TableActions
+                                columns={columns} />
+                            <Table
+                                tableId="usersTable"
+                                columns={columns}
+                                onRowClick={handleRowClick}
+                            />
                         </div>
-                        <Table
-                            tableId="usersTable"
-                            columns={columns}
-                            onRowClick={handleRowClick}
-                        />
-                    </div>
+                    </DataTableProvider>
+
 
                     {/* Create Modal */}
                     <Modal isOpen={isCreateOpen} onClose={() => setCreateOpen(false)}>

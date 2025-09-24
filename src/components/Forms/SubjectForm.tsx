@@ -1,77 +1,83 @@
-    import React, { useEffect, useState } from "react";
-    import type {Subject} from "../Table/Subjects/Subject.type.ts";
+import { useEffect } from "react";
+import type { Subject } from "../Table/Subjects/Subject.type.ts";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-    interface SubjectFormProps {
-        initialData?: Partial<Subject>;
-        onSubmit: (data: { name: string; description: string }) => Promise<void> | void;
-        submitLabel?: string;
-    }
+const subjectSchema = z.object({
+    name: z.string().min(1, "Subject name is required"),
+    description: z.string().min(1, "Description is required"),
+});
 
-    function SubjectForm({
-                             initialData,
-                             onSubmit,
-                             submitLabel = "Create Subject",
-                         }: SubjectFormProps) {
-        const [formData, setFormData] = useState<{ name: string; description: string }>({
+type SubjectFormData = z.infer<typeof subjectSchema>;
+
+interface SubjectFormProps {
+    initialData?: Partial<Subject>;
+    onSubmit: (data: SubjectFormData) => Promise<void> | void;
+    submitLabel?: string;
+}
+
+function SubjectForm({
+                         initialData,
+                         onSubmit,
+                         submitLabel = "Create Subject",
+                     }: SubjectFormProps) {
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm<SubjectFormData>({
+        resolver: zodResolver(subjectSchema),
+        defaultValues: {
             name: "",
             description: "",
-        });
+        },
+    });
 
-        useEffect(() => {
-            if (initialData) {
-                setFormData((prev) => ({
-                    ...prev,
-                    ...initialData,
-                }));
-            }
-        }, [initialData]);
+    useEffect(() => {
+        if (initialData) {
+            reset({
+                name: initialData.name || "",
+                description: initialData.description || "",
+            });
+        }
+    }, [initialData, reset]);
 
-        const handleChange = (
-            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-        ) => {
-            const { name, value } = e.target;
-            setFormData((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        };
+    const submitHandler = async (data: SubjectFormData) => {
+        await onSubmit(data);
+    };
 
-        const handleSubmit = async (e: React.FormEvent) => {
-            e.preventDefault();
-            await onSubmit(formData);
-        };
+    return (
+        <form onSubmit={handleSubmit(submitHandler)} className="formContainer">
+            <div className="form-group">
+                <label htmlFor="name" className="form-label">Subject Name</label>
+                <input
+                    id="name"
+                    type="text"
+                    {...register("name")}
+                    className="form-input"
+                />
+                {errors.name && <p className="error-text">{errors.name.message}</p>}
+            </div>
 
-        return (
-            <form onSubmit={handleSubmit} className="formContainer">
-                <div className="form-group">
-                    <label className="form-label">Subject Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="form-input"
-                        required
-                    />
-                </div>
+            <div className="form-group">
+                <label htmlFor="description" className="form-label">Description</label>
+                <textarea
+                    id="description"
+                    {...register("description")}
+                    className="form-input"
+                />
+                {errors.description && (
+                    <p className="error-text">{errors.description.message}</p>
+                )}
+            </div>
 
-                <div className="form-group">
-                    <label className="form-label">Description</label>
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        className="form-input"
-                        required
-                    />
-                </div>
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : submitLabel}
+            </button>
+        </form>
+    );
+}
 
-                <button type="submit" className="btn btn-primary">
-                    {submitLabel}
-
-                </button>
-            </form>
-        );
-    }
-
-    export default SubjectForm;
+export default SubjectForm;

@@ -1,17 +1,38 @@
-import { buildQueryParams } from "../../utils/queryParams.ts";
-import { useFetch } from "../../hooks/api/useFetch.tsx";
-import type { Subject } from "../Table/Subjects/Subject.type.ts";
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import Spinner from "../Spinner/Spinner";
+import type { Subject } from "../Table/Subjects/Subject.type";
+import { buildQueryParams } from "../../utils/queryParams";
 import "./form.css";
-import Spinner from "../Spinner/Spinner.tsx";
 
-export interface TaskFormData {
-    subject_id: number;
-    title: string;
-    description: string;
-    requirements: string;
-    due_date: string;
-    max_score: number;
+// Schema with Zod
+
+const taskSchema = z.object({
+    subject_id: z.number().min(1, "Please select a subject"),
+    title: z.string().min(1, "Title is required"),
+    description: z.string().min(1, "Description is required"),
+    requirements: z.string().optional(),
+    due_date: z
+        .string()
+        .min(1, "Due date is required")
+        .refine((val) => new Date(val) > new Date(), {
+            message: "Due date must be in the future",
+        }),
+    max_score: z
+        .number()
+        .min(1, "Max score must be greater than 0")
+        .max(100, "Max score cannot exceed 100"),
+});
+
+export type TaskFormData = z.infer<typeof taskSchema>;
+
+
+interface SubjectApiResponse {
+    records: Subject[];
+    message: string;
 }
 
 interface TaskFormProps {
@@ -20,120 +41,98 @@ interface TaskFormProps {
     submitLabel?: string;
 }
 
-interface SubjectApiResponse {
-    records: Subject[];
-    message: string;
-}
 
-function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFormProps) {
-    const [page] = useState(1);
-    const [pageSize] = useState(10);
+function TaskForm({
+                      initialData,
+                      onSubmit,
+                      submitLabel = "Create Task",
+                  }: TaskFormProps) {
 
-    const [formData, setFormData] = useState<TaskFormData>({
-        subject_id: initialData?.subject_id ?? 0,
-        title: "",
-        description: "",
-        requirements: "",
-        due_date: "",
-        max_score: 100,
-    });
 
-    const [errors, setErrors] = useState<Partial<Record<keyof TaskFormData, string>>>({});
-
-    // Initialize formData once
-    useEffect(() => {
-        if (initialData) {
-            setFormData((prev) => ({
-                ...prev,
-                ...initialData,
-            }));
-        }
-    }, []); // run only once on mount
-
-    // Fetch subjects
+    const page = 1;
+    const pageSize = 20;
     const subjectUrl = `/api/admin/subjects/${buildQueryParams({
         page,
         page_size: pageSize,
     })}`;
-    const fetchOptions = { headers: { "Content-Type": "application/json" } };
-    const { data, loading: subjectLoading } = useFetch<SubjectApiResponse>(subjectUrl, fetchOptions);
-    const subjects: Subject[] = data?.records ?? [];
 
-    // Validation helper
-    const validateField = (field: keyof TaskFormData, value: any): string => {
-        switch (field) {
-            case "subject_id":
-                return value ? "" : "Please select a subject.";
-            case "title":
-                return value.trim() ? "" : "Title is required.";
-            case "description":
-                return value.trim() ? "" : "Description is required.";
-            case "due_date":
-                if (!value) return "Due date is required.";
-                if (new Date(value) <= new Date()) return "Due date must be in the future.";
-                return "";
-            case "max_score":
-                if (value <= 0) return "Max score must be greater than 0.";
-                if (value > 100) return "Max score cannot exceed 100.";
-                return "";
-            default:
-                return "";
-        }
-    };
+    const fetchSubjects = async (): Promise<SubjectApiResponse> => {
+        const token = import.meta.env.VITE_ADMIN_BEARER_TOKEN;
+        const res = await fetch(subjectUrl, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization : `Bearer ${token}`
+            },
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-        const { name, value } = e.target;
-        const key = name as keyof TaskFormData;
-
-        setFormData((prev) => ({
-            ...prev,
-            [key]: key === "subject_id" || key === "max_score" ? Number(value) : value,
-        }));
-
-        // Validate this field
-        setErrors((prev) => ({
-            ...prev,
-            [key]: validateField(key, value),
-        }));
-    };
-
-    const validateForm = (): boolean => {
-        const newErrors: Partial<Record<keyof TaskFormData, string>> = {};
-        (Object.keys(formData) as (keyof TaskFormData)[]).forEach((key) => {
-            const error = validateField(key, formData[key]);
-            if (error) newErrors[key] = error;
         });
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        if (!res.ok) throw new Error("Failed to fetch subjects");
+        return res.json();
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validateForm()) return;
+    const {
+        data: subjectData,
+        isLoading: subjectLoading,
+        isError,
+        error,
+    } = useQuery<SubjectApiResponse>({
+        queryKey: ["subjects", page, pageSize],
+        queryFn: fetchSubjects,
+    });
 
-        const payload: TaskFormData = {
-            ...formData,
-            due_date: formData.due_date ? new Date(formData.due_date).toISOString() : "",
+    const subjects = subjectData?.records ?? [];
+
+    // -----------------------------
+    // React Hook Form
+    // -----------------------------
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors, isSubmitting },
+    } = useForm<TaskFormData>({
+        resolver: zodResolver(taskSchema),
+        defaultValues: {
+            subject_id: initialData?.subject_id ?? 0,
+            title: initialData?.title ?? "",
+            description: initialData?.description ?? "",
+            requirements: initialData?.requirements ?? "",
+            due_date: initialData?.due_date ?? "",
+            max_score: initialData?.max_score ?? 100,
+        },
+    });
+
+    // Patch initial data into form
+    useEffect(() => {
+        if (initialData) {
+            Object.entries(initialData).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    setValue(key as keyof TaskFormData, value as any);
+                }
+            });
+        }
+    }, [initialData, setValue]);
+
+    const submitHandler = async (data: TaskFormData) => {
+        const payload = {
+            ...data,
+            due_date: new Date(data.due_date).toISOString(),
         };
-
         if (onSubmit) await onSubmit(payload);
     };
 
     if (subjectLoading) return <Spinner />;
+    if (isError) return <p className="error">Error: {String(error)}</p>;
+
+
 
     return (
-        <form onSubmit={handleSubmit} className="formContainer">
+        <form onSubmit={handleSubmit(submitHandler)} className="formContainer">
+            {/* Subject */}
             <div className="form-group">
                 <label className="form-label">Subject</label>
                 <select
-                    name="subject_id"
-                    value={formData.subject_id || ""}
-                    onChange={handleChange}
+                    {...register("subject_id", { valueAsNumber: true })}
                     className="form-input"
-                    required
                 >
                     <option value="">-- Select a Subject --</option>
                     {subjects.map((subject) => (
@@ -142,73 +141,56 @@ function TaskForm({ initialData, onSubmit, submitLabel = "Create Task" }: TaskFo
                         </option>
                     ))}
                 </select>
-                {errors.subject_id && <p className="error">{errors.subject_id}</p>}
+                {errors.subject_id && <p className="error">{errors.subject_id.message}</p>}
             </div>
 
+            {/* Title */}
             <div className="form-group">
                 <label className="form-label">Title</label>
-                <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    className="form-input"
-                    required
-                />
-                {errors.title && <p className="error">{errors.title}</p>}
+                <input type="text" {...register("title")} className="form-input" />
+                {errors.title && <p className="error">{errors.title.message}</p>}
             </div>
 
+            {/* Description */}
             <div className="form-group">
                 <label className="form-label">Description</label>
-                <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="form-input"
-                    required
-                />
-                {errors.description && <p className="error">{errors.description}</p>}
+                <textarea {...register("description")} className="form-input" />
+                {errors.description && (
+                    <p className="error">{errors.description.message}</p>
+                )}
             </div>
 
+            {/* Requirements */}
             <div className="form-group">
                 <label className="form-label">Requirements</label>
-                <textarea
-                    name="requirements"
-                    value={formData.requirements}
-                    onChange={handleChange}
-                    className="form-input"
-                />
+                <textarea {...register("requirements")} className="form-input" />
             </div>
 
+            {/* Due Date */}
             <div className="form-group">
                 <label className="form-label">Due Date</label>
                 <input
                     type="datetime-local"
-                    name="due_date"
-                    value={formData.due_date}
-                    onChange={handleChange}
+                    {...register("due_date")}
                     className="form-input"
-                    required
                     min={new Date().toISOString().slice(0, 16)}
-
                 />
-                {errors.due_date && <p className="error">{errors.due_date}</p>}
+                {errors.due_date && <p className="error">{errors.due_date.message}</p>}
             </div>
 
+            {/* Max Score */}
             <div className="form-group">
                 <label className="form-label">Max Score</label>
                 <input
                     type="number"
-                    name="max_score"
-                    value={formData.max_score}
-                    onChange={handleChange}
+                    {...register("max_score", { valueAsNumber: true })}
                     className="form-input"
                 />
-                {errors.max_score && <p className="error">{errors.max_score}</p>}
+                {errors.max_score && <p className="error">{errors.max_score.message}</p>}
             </div>
 
-            <button type="submit" className="btn btn-primary">
-                {submitLabel}
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? "Submitting..." : submitLabel}
             </button>
         </form>
     );

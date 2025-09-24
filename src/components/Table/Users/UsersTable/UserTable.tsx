@@ -4,13 +4,13 @@ import {useUserColumns} from "./UserColumns.tsx";
 import {UserTableSkeleton} from "./userTableSkeleton.tsx";
 import {useNavigate} from "@tanstack/react-router";
 import type { UserApiResponse } from "../../../../routes/_protected/users";
-import {FilterManager} from "../../ReusableTable/TableActions/FilterManager.tsx";
-import {SortManager} from "../../ReusableTable/TableActions/SortManager.tsx";
+import {TableActions} from "../../ReusableTable/TableActions/TableActions.tsx";
+import {DataTableProvider} from "../../providers/DataTableProvider.tsx";
 
 export interface UserTableProps {
     loading: boolean;
     error: unknown;
-    data: UserApiResponse | null;
+    data: UserApiResponse | undefined;
     searchQuery: string;
     setSearchQuery: (v: string) => void;
     roleFilter: string;
@@ -82,22 +82,19 @@ function UserTable({loading, error, data,searchQuery,setSearchQuery,roleFilter,s
 
 
             {users.length> 0 ? (
-                <div className={"results-table"}>
-
-                    <div style={{ display: "flex", flexDirection: "row",alignItems:"center", justifyContent:"end"}}>
-                        <div>
-                            <FilterManager columns={columns}/>
-                        </div>
-                        <div>
-                            <SortManager columns={columns}/>
-                        </div>
+                <DataTableProvider<User> data={users}>
+                    <div className={"results-table"}>
+                        <TableActions
+                            columns={columns}
+                        />
+                        <Table
+                            tableId={"usersTable"}
+                            columns={columns}
+                            onRowClick={handleRowClick}
+                        />
                     </div>
-                    <Table
-                        tableId={"usersTable"}
-                        columns={columns}
-                        onRowClick={handleRowClick}
-                    />
-                </div>
+                </DataTableProvider>
+
             ) : (
                 <div className={"no-data-error"}>
                     <h2> No users found.</h2>

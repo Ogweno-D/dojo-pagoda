@@ -25,21 +25,29 @@ export function  useUserColumns() {
             id: "avatar_url",
             caption: "Avatar",
             render: (url) => <img src={url} alt="User Avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />,
+            rowProps: (user) => {
+                let backgroundColor = 'transparent';
+                if (user.status === 'approved') {
+                    backgroundColor = '#f3eded';
+                }
+                return {
+                    style: { backgroundColor },
+                };
+            },
         }),
         createTableColumn<User>({
             id: "name",
             caption: "Name",
             render: (name) => <strong style={{ textDecoration: 'underline' }}>{name}</strong>,
-
-            // rowProps: (user) => {
-            //     let backgroundColor = 'transparent';
-            //     if (user.status === 'approved') {
-            //         backgroundColor = '#f3eded';
-            //     }
-            //     return {
-            //         style: { backgroundColor },
-            //     };
-            // },
+            rowProps: (user) => {
+                let backgroundColor = 'transparent';
+                if (user.status === 'approved') {
+                    backgroundColor = '#f3eded';
+                }
+                return {
+                    style: { backgroundColor },
+                };
+            },
         }),
         createTableColumn<User>({
             id: "email",

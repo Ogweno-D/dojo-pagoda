@@ -4,8 +4,8 @@ import { useTaskColumns } from "./TaskColumns.ts";
 import { UserTableSkeleton } from "../../Users/UsersTable/userTableSkeleton.tsx";
 import { Table } from "../../ReusableTable/Table.tsx";
 import "../task.css";
-import {FilterManager} from "../../ReusableTable/TableActions/FilterManager.tsx";
-import {SortManager} from "../../ReusableTable/TableActions/SortManager.tsx";
+import { TableActions } from "../../ReusableTable/TableActions/TableActions.tsx";
+import {DataTableProvider} from "../../providers/DataTableProvider.tsx";
 interface TaskApiResponse {
     domain: string;
     current_page: number;
@@ -18,7 +18,7 @@ interface TaskApiResponse {
 interface TaskTableProps {
     loading: boolean;
     error: unknown;
-    data: TaskApiResponse | null;
+    data: TaskApiResponse | undefined;
 }
 
 function TaskTable({ loading, error, data }: TaskTableProps) {
@@ -55,19 +55,17 @@ function TaskTable({ loading, error, data }: TaskTableProps) {
 
             {tasks.length > 0 ? (
                 <>
-                    <div style={{ display: "flex", flexDirection: "row", justifyContent:"end"}}>
-                        <div>
-                            <FilterManager columns={columns}/>
-                        </div>
-                        <div>
-                            <SortManager columns={columns}/>
-                        </div>
-                    </div>
+                <DataTableProvider<Task> data={tasks}>
+                <TableActions
+                        columns={columns}
+                    />
                     <Table
                         tableId="tasksTable"
                         columns={columns}
                         onRowClick={handleRowClick}
                     />
+                </DataTableProvider>
+
                 </>
             ) : (
                 <div className="no-data-error">

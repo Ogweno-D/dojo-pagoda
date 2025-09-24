@@ -1,10 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 import UserTable from "../../../components/Table/Users/UsersTable/UserTable.tsx";
-import type {User} from "../../../components/Table/Users/User.type.ts";
-import {DataTableProvider, useDataTable} from "../../../components/Table/providers/DataTableProvider.tsx";
-import {buildQueryParams} from "../../../utils/queryParams.ts";
-import {useFetch} from "../../../hooks/api/useFetch.tsx";
-import {useEffect, useState} from "react";
+import type { User } from "../../../components/Table/Users/User.type";
+import { buildQueryParams } from "../../../utils/queryParams";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PaginationWrapper from "../../../components/Table/ReusableTable/TableActions/PaginationWrapper.tsx";
 
 export interface UserApiResponse {
@@ -16,66 +15,85 @@ export interface UserApiResponse {
   page_size: number;
 }
 
-export const Route = createFileRoute('/_protected/users/')({
+async function getUsers(params: {
+  page: number;
+  page_size: number;
+  search?: string;
+  role?: string;
+  status?: string;
+}): Promise<UserApiResponse> {
+  const token = import.meta.env.VITE_ADMIN_BEARER_TOKEN;
+  const url = `/api/admin/users${buildQueryParams(params)}`;
+  const res = await fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) throw new Error(`Failed to fetch users: ${res.status}`);
+  return res.json();
+}
+
+export const Route = createFileRoute("/_protected/users/")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return (
-      <DataTableProvider<User>
-          data={[]}
-          initialState={{filters:[], sorts: [], page:1, pageSize:5}}
-        >
-
-      <UserTableWrapper />
-    </DataTableProvider>
-  );
+  return <UserTableWrapper />;
 }
 
 function UserTableWrapper() {
-  const {page, pageSize, setData,setPage} = useDataTable<User>()
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const queryClient = useQueryClient();
 
-  const [debouncedSearch, setDebouncedSearch] = useState<string>(searchQuery);
+  // Table state
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
-  //Debounce the input
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 1000);
-    return ()=> clearTimeout(t);
+    const t = setTimeout(() => setDebouncedSearch(searchQuery.trim()), 500);
+    return () => clearTimeout(t);
   }, [searchQuery]);
 
-  //Decounced search
-  useEffect(()=>{
-    setPage(1);
-  },[debouncedSearch,setPage])
-
-
-  const params = {
-    page,
-    page_size: pageSize,
-    ...(debouncedSearch ? { search:debouncedSearch } :{}),
-    role: roleFilter,
-    status: statusFilter,
-  }
-  const url = `/api/admin/users/${buildQueryParams(params)}`;
-
-  const { data, loading, error } = useFetch<UserApiResponse>(url,{
-    headers: { "Content-Type": "application/json" },
+  const { data, isLoading, isError, error, isFetching } = useQuery<UserApiResponse>({
+    queryKey: ["users", page, pageSize, debouncedSearch, roleFilter, statusFilter],
+    queryFn: () =>
+        getUsers({
+          page,
+          page_size: pageSize,
+          search: debouncedSearch || undefined,
+          role: roleFilter || undefined,
+          status: statusFilter || undefined,
+        }),
   });
 
-  const users: User[] = data?.records ?? [];
-
+  // Prefetch next page
   useEffect(() => {
-    setData(users)
-  }, [users, setData]);
+    if (data?.current_page && data?.current_page < (data?.last_page ?? 0)) {
+      const nextPage = data.current_page + 1;
+      queryClient.prefetchQuery({
+        queryKey: ["users", nextPage, pageSize, debouncedSearch, roleFilter, statusFilter],
+        queryFn: () =>
+            getUsers({
+              page: nextPage,
+              page_size: pageSize,
+              search: debouncedSearch || undefined,
+              role: roleFilter || undefined,
+              status: statusFilter || undefined,
+            }),
+      });
+    }
+  }, [data, pageSize, debouncedSearch, roleFilter, statusFilter, queryClient]);
 
-  return(
+  return (
       <>
         <UserTable
-            loading={loading}
-            error={error}
+            loading={isLoading}
+            error={isError ? error : null}
             data={data}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -83,9 +101,19 @@ function UserTableWrapper() {
             setRoleFilter={setRoleFilter}
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
-
         />
-        <PaginationWrapper data={data} />
-        </>
-  );
+
+        {data && (
+            <PaginationWrapper
+                currentPage={data.current_page}
+                lastPage={data.last_page}
+                pageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={setPageSize}
+                isFetching={isFetching}
+            />
+        )}
+      </>
+
+   )
 }

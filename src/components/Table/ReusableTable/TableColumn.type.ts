@@ -21,7 +21,7 @@ export type TableColumn<T extends object, K extends keyof T> = {
     /** A unique ID for the column. */
     id: K;
     /** The display caption for the column header. */
-    caption?: string;
+    caption: string;
     /** The estimated column width in pixels. */
     size?: number;
     /** Text alignment for the column data. */

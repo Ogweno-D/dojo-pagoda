@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import type { FilterRule, SortRule } from "../ReusableTable/TableActions/types.ts";
 
-interface DataTableContextType<T> {
+interface DataTableContextType<T extends object> {
     originalData: T[];
     filteredAndSortedData: T[];
 
@@ -33,10 +33,10 @@ const DataTableContext = createContext<DataTableContextType<any> | undefined>(
     undefined
 );
 
-export const useDataTable = <T,>() => {
+export const useDataTable = <T extends object>() => {
     const context = useContext(DataTableContext);
     if (!context) {
-        throw new Error("useDataTable must be used within a Datatable provider");
+        throw new Error("useDataTable must be used within a DataTableProvider");
     }
     return context as DataTableContextType<T>;
 };

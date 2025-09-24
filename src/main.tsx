@@ -1,64 +1,80 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import {routeTree} from './routeTree.gen'
-import {createRouter, ErrorComponent, RouterProvider} from "@tanstack/react-router";
-import {ToastProvider} from "./context/Toast/ToastProvider.tsx";
-import { useAuth} from "./context/auth/AuthContext.tsx";
-import {AuthProvider} from "./context/auth/AuthContext.tsx";
-import { MantineProvider } from '@mantine/core';
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import { routeTree } from "./routeTree.gen";
+import {
+    createRouter,
+    RouterProvider,
+    ErrorComponent,
+} from "@tanstack/react-router";
+import { ToastProvider } from "./context/Toast/ToastProvider";
+import { AuthProvider, useAuth } from "./context/auth/AuthContext";
+import { MantineProvider } from "@mantine/core";
+import {
+    QueryClient,
+    QueryClientProvider,
+} from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 1000 * 60 * 5,
+            gcTime: 1000 * 60 * 30,
+            retry: 2,
+            refetchOnWindowFocus: true,
+        },
+    },
+});
 
 const router = createRouter({
     routeTree,
     context: {
-        auth: undefined!
+        auth: undefined!,
     },
-    defaultPreload :'intent',
-    defaultNotFoundComponent: () => {
-        return (
-            <div>
-                <div> Page Not Found</div>
-                <div> 404 Not Found</div>
-
-            </div>
-        )
-    },
-    defaultErrorComponent: ({error}) => {
-        if(error instanceof  Error){
+    defaultPreload: "intent",
+    defaultNotFoundComponent: () => (
+        <div>
+            <div>Page Not Found</div>
+            <div>404 Not Found</div>
+        </div>
+    ),
+    defaultErrorComponent: ({ error }) => {
+        if (error instanceof Error) {
             return (
                 <div>
-                    <div> Error !</div>
-                    <div> {error.message}</div>
+                    <div>Error!</div>
+                    <div>{error.message}</div>
                 </div>
-            )
+            );
         }
-
-        return <ErrorComponent error={error} />
-    }
+        return <ErrorComponent error={error} />;
+    },
 });
 
-
-declare  module '@tanstack/react-router' {
-    interface Register{
-        router: typeof router
+// Extend module
+declare module "@tanstack/react-router" {
+    interface Register {
+        router: typeof router;
     }
 }
 
-export  function Router(){
+function AppRouter() {
     const auth = useAuth();
-    return <RouterProvider router={router} context={{auth}}/>
+    return <RouterProvider router={router} context={{ auth }} />;
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-      <MantineProvider withCssVariables={true} withGlobalClasses={true}>
-          <ToastProvider position="top-right">
-              <AuthProvider>
-                    <Router />
-                  {/*<RouterProvider router={router}></RouterProvider>*/}
-              </AuthProvider>
-          </ToastProvider>
-      </MantineProvider>
-  </StrictMode>,
-)
+createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+        <MantineProvider withCssVariables withGlobalClasses>
+            <ToastProvider position="top-right">
+                <AuthProvider>
+                    <QueryClientProvider client={queryClient}>
+                        <AppRouter />
+                        <ReactQueryDevtools initialIsOpen={false} />
+                    </QueryClientProvider>
+                </AuthProvider>
+            </ToastProvider>
+        </MantineProvider>
+    </StrictMode>
+);
